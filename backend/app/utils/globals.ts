@@ -187,7 +187,7 @@ export function craftProfilePictureDest(userId: string): string {
 }
 
 export function craftProfilePictureURL(userId: string, pictureName: string): string {
-    return path.join("users/", userId, "profile/", pictureName);
+    return pictureName && pictureName.length > 0 ? path.join("users/", userId, "profile/", pictureName) : "";
 }
 
 export function moveFiles(dir: string, files: string[], callback: Function) {
