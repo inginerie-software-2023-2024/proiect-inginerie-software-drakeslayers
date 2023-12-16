@@ -4,7 +4,14 @@
 
 <ng-template #profilePicTpl>
   <div class="picture-container" [style.--img-size]="imgSize">
-    <mat-icon *ngIf="!displayProfilePicure">person</mat-icon>
-    <img *ngIf="displayProfilePicure" [src]="pictureSrc | apiPrefix" (error)="onImgError($event)" />
+    <img
+      *ngIf="displayProfilePicure && pictureSrc?.length; else guestTpl"
+      [src]="pictureSrc | apiPrefix"
+      (error)="onImgError($event)"
+    />
   </div>
+</ng-template>
+
+<ng-template #guestTpl>
+  <mat-icon>person</mat-icon>
 </ng-template>
