@@ -1,0 +1,78 @@
+@use "colors" as *;
+@use "mixins" as mixins;
+
+@mixin mat-icon($size, $font-size: calc($size * 0.75)) {
+  font-size: $font-size;
+  line-height: $size;
+  height: $size;
+  width: $size;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: $body-bkg-color;
+  height: 100%;
+}
+
+.register-form-container {
+  @include mixins.content-container(400px, 0);
+
+  .register-form-header {
+    border-bottom: 2px solid $gray-300;
+
+    .header-text {
+      text-align: center;
+      color: $primary-800;
+      font-weight: 500;
+    }
+  }
+
+  .register-form {
+    padding: 32px;
+  }
+
+  .register-form-field {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .register-button {
+    height: 40px;
+    width: 100%;
+    color: $very-light-text-color;
+    text-transform: uppercase;
+  }
+
+  #password, #confirmPassword {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    letter-spacing: 0.125em;
+  }
+}
+
+.login {
+  text-align: center;
+  margin-bottom: 0;
+
+  a {
+    text-decoration: none;
+    color: $primary;
+  }
+}
+
+#password {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  letter-spacing: 0.125em;
+}
+
+$btn-size: 32px;
+mat-icon {
+  @include mixins.mat-icon($btn-size);
+  cursor: pointer;
+}
+
+mds-error-box {
+  margin: 32px 32px 0 32px;
+}

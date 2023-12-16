@@ -1,0 +1,65 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as mixins;
+@use "typography-levels" as typography-levels;
+
+$page-vertical-padding: 16px;
+$page-horizontal-padding: 16px;
+$page-max-height: calc(100vh - $navbar-height - 2 * $page-vertical-padding);
+$page-max-width: calc(100vw - 2 * $page-horizontal-padding);
+$comments-width: 500px;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.post {
+  @include mixins.content-container(fit-content, 0);
+  display: flex;
+  flex-direction: row;
+  max-height: $page-max-height;
+  max-width: $page-max-width;
+  height: $post-image-height;
+  border-radius: 0;
+  border: $separator-300;
+}
+
+.post-media {
+  max-height: $page-max-height;
+  max-width: $page-max-width;
+  height: $post-image-height;
+  aspect-ratio: $post-image-aspect-ratio;
+  border-right: $separator-300;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  width: $comments-width;
+}
+
+.profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+  border-bottom: $separator-300;
+
+  .profile-pic {
+    margin-right: 8px;
+  }
+}
+
+.post-comments {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.post-actions {
+  padding: 4px 12px 4px 8px;
+  border-top: $separator-300;
+}

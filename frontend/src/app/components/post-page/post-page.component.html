@@ -1,0 +1,25 @@
+<div
+  *ngIf="{ post: post$ | async, userProfile: userProfile$ | async, postComments: postComments$ | async } as data"
+  class="post"
+>
+  <div class="post-media">
+    <mds-post-media *ngIf="data.post" [picturesURLs]="data.post.picturesURLs"></mds-post-media>
+  </div>
+  <div class="right-panel">
+    <div class="profile">
+      <mds-profile-pic
+        class="profile-pic"
+        [pictureSrc]="data.userProfile?.profilePictureURL"
+        [imgSize]="'40px'"
+        [userId]="data.userProfile?.userId"
+      />
+      <mds-username [username]="data.userProfile?.username" [userId]="data.userProfile?.userId" />
+    </div>
+    <div class="post-comments">
+      <mds-post-comments [post]="data.post!"></mds-post-comments>
+    </div>
+    <div class="post-actions">
+      <mds-post-actions [post]="data.post!" />
+    </div>
+  </div>
+</div>
