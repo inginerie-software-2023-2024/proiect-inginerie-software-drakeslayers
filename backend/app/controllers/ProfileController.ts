@@ -54,7 +54,7 @@ export class ProfileController {
                 }
 
                 const profile = arr[0];
-                profile.profilePictureURL = path.join(craftProfilePictureURL(profile.userId, profile.profilePictureURL));
+                profile.profilePictureURL = craftProfilePictureURL(profile.userId, profile.profilePictureURL);
                 return res.status(200).json({ error: undefined, content: profile });
             })
             .catch(err => {
