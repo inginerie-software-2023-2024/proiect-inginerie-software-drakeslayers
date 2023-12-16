@@ -19,7 +19,7 @@ import { Observable, Subscription, catchError, map, of, switchMap } from 'rxjs';
 })
 export class ShowProfileComponent implements OnInit, OnDestroy {
   private sub: Subscription = new Subscription();
-  public readonly currentUser$: Observable<SessionUser | undefined> = this.userService.currentUser$;
+  public readonly currentUser$: Observable<SessionUser | null | undefined> = this.userService.currentUser$;
   public isCurrentUserProfile$!: Observable<boolean>;
   public isFollowing$!: Observable<boolean>;
   public profile: Profile | undefined;

@@ -13,7 +13,7 @@ import { handleError } from 'app/shared/utils/error';
 })
 export class NavbarComponent {
   public readonly isLoggedIn$: Observable<boolean> = this.userService.isLoggedIn$;
-  public readonly currentUser$: Observable<SessionUser | undefined> = this.userService.currentUser$;
+  public readonly currentUser$: Observable<SessionUser | null | undefined> = this.userService.currentUser$;
 
   private readonly router: Router = new Router();
   constructor(private readonly userService: UserService) {}
