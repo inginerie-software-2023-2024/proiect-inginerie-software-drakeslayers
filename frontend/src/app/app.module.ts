@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -12,7 +12,6 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { ProfilePicComponent } from './components/profile-pic/profile-pic.component';
 import { PostMediaComponent } from './components/post/post-media/post-media.component';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { CommentSectionComponent } from './components/comment/comment-section/comment-section.component';
 import { CreatePostComponent } from './components/post/create-post/create-post.component';
 import { CommentCreateComponent } from './components/comment/comment-create/comment-create.component';
@@ -31,6 +30,19 @@ import { CommentLikeComponent } from './components/post/comments/comment-like/co
 import { FeedPostComponent } from './components/post/feed-post/feed-post.component';
 import { ShowProfileComponent } from './components/show-profile/show-profile.component';
 import { FollowersComponent } from './components/followers/followers.component';
+import { NotificationsPageComponent } from './components/notifications/notifications-page/notifications-page.component';
+import { Observable } from 'rxjs';
+import { NotificationsService } from './core/services/notifications.service';
+
+function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
+  return () => {
+    return new Observable((observer) => {
+      notificationsService.startListening();
+      observer.next();
+      observer.complete();
+    });
+  }
+}
 
 @NgModule({
   declarations: [
@@ -59,10 +71,16 @@ import { FollowersComponent } from './components/followers/followers.component';
     CommentLikeComponent,
     FeedPostComponent,
     ShowProfileComponent,
-    FollowersComponent
+    FollowersComponent,
+    NotificationsPageComponent
   ],
   imports: [BrowserModule, AppRoutingModule, SharedModule, MaterialModule, MatButtonModule],
-  providers: [],
+  providers: [{
+    provide: APP_INITIALIZER,
+    useFactory: initializeAppFactory,
+    deps: [NotificationsService],
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

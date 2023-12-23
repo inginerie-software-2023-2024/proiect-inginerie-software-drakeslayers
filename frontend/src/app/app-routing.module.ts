@@ -11,12 +11,14 @@ import { FeedComponent } from './components/feed/feed.component';
 import { PostPageComponent } from './components/post-page/post-page.component';
 import { ShowProfileComponent } from './components/show-profile/show-profile.component';
 import { IsLoggedInGuard } from './shared/guards/is-logged-in.guard';
+import { NotificationsPageComponent } from './components/notifications/notifications-page/notifications-page.component';
 
 const routes: Routes = [
   { path: 'api-tests', component: ApiTestsComponent },
   { path: 'login', component: LoginFormComponent },
   { path: 'register', component: RegisterFormComponent },
   { path: 'posts/create', component: CreatePostComponent, canActivate: [IsLoggedInGuard] },
+  { path: 'notifications', component: NotificationsPageComponent, canActivate: [IsLoggedInGuard] },
   { path: 'posts/:id', component: PostPageComponent },
   { path: 'create-profile', component: CreateProfileComponent, canActivate: [IsLoggedInGuard] },
   { path: 'edit-profile', component: EditProfileComponent, canActivate: [IsLoggedInGuard] },
