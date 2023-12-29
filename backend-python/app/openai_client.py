@@ -43,6 +43,7 @@ class OpenAIModel:
             chat_prompt.format_prompt().to_messages()
         )
         response = response.content.split(" ")
+        response = [hashtag[1:] for hashtag in response if hashtag.startswith("#")]
         return response
         
 
