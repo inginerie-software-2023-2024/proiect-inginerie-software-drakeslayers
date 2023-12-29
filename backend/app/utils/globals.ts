@@ -78,7 +78,7 @@ export interface Post {
     userId: string,
     description?: string,
     picturesURLs: string[],
-    hashtags?: string[],
+    hashtags: string[],
 }
 
 export interface PostLike {
