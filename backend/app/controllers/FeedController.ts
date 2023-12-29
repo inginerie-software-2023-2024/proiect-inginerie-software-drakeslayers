@@ -10,6 +10,25 @@ function getAllUsers() {
         .select("*");
 }
 
+function getUserPreferredHashtags(userId: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+        knexInstance.select('hashtags')
+            .from('Profiles')
+            .where('userId', userId)
+            .first()
+            .then(profile => {
+                if (profile && profile.hashtags) {
+                    resolve(profile.hashtags);
+                } else {
+                    resolve([]); // No hashtags found, return an empty array
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching preferred hashtags:", error);
+                reject(error);
+            });
+    });
+}
 export class FeedController {
     getFeed(req: Request, res: Response, next: NextFunction) {
 
@@ -17,9 +36,10 @@ export class FeedController {
 
         const usersPromise: Promise<User[]> = getAllUsers();
         const followersPromise: Promise<Follower[]> = getAllFollowing(userId);
+        const userHashtagsPromise = getUserPreferredHashtags(userId);
 
-        Promise.all([usersPromise, followersPromise])
-            .then(([users, followers]: [User[], Follower[]]) => {
+        Promise.all([usersPromise, followersPromise, userHashtagsPromise])
+            .then(([users, followers, userPreferredHashtags] : [User[], Follower[], string[]]) => {
 
                 // this is used to set a higher priority 
                 // to posts made by user or those he follows
@@ -48,17 +68,17 @@ export class FeedController {
                             }
                         });
 
+                        const userPreferredHashtagsSet: Set<string> = new Set(userPreferredHashtags);
                         return posts.sort((a, b) => {
-                            const res1: boolean = followingIDSet.has(a.userId);
-                            const res2: boolean = followingIDSet.has(b.userId);
+                            const aIntersectionSize = a.hashtags.filter(tag => userPreferredHashtagsSet.has(tag)).length;
+                            const bIntersectionSize = b.hashtags.filter(tag => userPreferredHashtagsSet.has(tag)).length;
 
-                            // prioritize following and user posts 
-                            if (res1 && !res2)
-                                return -1;
-                            if (!res1 && res2)
-                                return 1;
+                            // Prioritize by number of matching hashtags
+                            if (aIntersectionSize > bIntersectionSize) return -1;
+                            if (aIntersectionSize < bIntersectionSize) return 1;
 
-                            return a.createdAt.valueOf() - b.createdAt.valueOf()
+                            // If equal, sort by creation date
+                            return b.createdAt.valueOf() - a.createdAt.valueOf();
                         });
                     })
                     .then((posts: Post[]) => {
