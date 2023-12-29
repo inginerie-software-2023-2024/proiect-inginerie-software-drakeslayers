@@ -83,5 +83,6 @@ app.use(feedRouter);
 
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(port, () => {
-    console.log(`Server listening on port ${port}`)
+    console.log(`Process pid: ${process.pid}`)
+    console.log(`Server listening on https://localhost:${port}`);
 });

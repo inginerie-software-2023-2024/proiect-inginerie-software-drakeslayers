@@ -113,7 +113,8 @@ export class ProfileController {
             username: req.body.username,
             name: req.body.name,
             profilePictureURL: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
-            bio: req.body.bio 
+            bio: req.body.bio,
+            hashtags: req.body.hashtags,
         }
 
         knexInstance('Profiles')
