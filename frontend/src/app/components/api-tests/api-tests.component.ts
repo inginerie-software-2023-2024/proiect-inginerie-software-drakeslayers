@@ -13,6 +13,7 @@ import { PostMetadata } from 'app/models/post-metadata.model';
 import { CommentCreate } from 'app/models/comment-create.model';
 import { PostLikeService } from 'app/core/services/post-like.service';
 import { CommentLikeService } from 'app/core/services/comment-like.service';
+import { NotificationsService } from 'app/core/services/notifications.service';
 
 @Component({
   selector: 'mds-api-tests',
@@ -53,10 +54,15 @@ export class ApiTestsComponent {
     private readonly postService: PostService,
     private readonly commentService: CommentService,
     private readonly postLikeService: PostLikeService,
-    private readonly commentLikeService: CommentLikeService
+    private readonly commentLikeService: CommentLikeService,
+    private readonly notificationsService: NotificationsService
   ) {}
 
   ngOnInit() {}
+
+  public onSocketButton(): void {
+    this.notificationsService.onSocketButton();
+  }
 
   onSubmit(): void {
     this.http

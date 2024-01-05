@@ -37,7 +37,7 @@ import { NotificationsService } from './core/services/notifications.service';
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
   return () => {
     return new Observable((observer) => {
-      notificationsService.startListening();
+      notificationsService.setupSocket();
       observer.next();
       observer.complete();
     });

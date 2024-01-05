@@ -25,6 +25,7 @@ const routes: Routes = [
   { path: 'feed', component: FeedComponent, canActivate: [IsLoggedInGuard] },
   { path: 'posts/:id', component: PostPageComponent },
   { path: 'profile/:userId', component: ShowProfileComponent },
+  { path: 'api-tests', component: ApiTestsComponent },
   { path: '', redirectTo: '/feed', pathMatch: 'full' },
 ];
 

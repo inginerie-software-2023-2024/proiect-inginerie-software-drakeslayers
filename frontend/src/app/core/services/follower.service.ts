@@ -27,8 +27,6 @@ export class FollowerService {
   }
 
   public unfollow(userId: string) {
-    //followerRouter.delete('/follow/:userId', authenticationController.isAuthenticated, followerController.delete);
-
     const url = 'api/follow/' + userId;
     return this.httpClient.delete<GenericResponse<Follower>>(url);
   }

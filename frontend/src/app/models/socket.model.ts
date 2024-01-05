@@ -1,12 +1,13 @@
 import { Socket } from 'socket.io-client';
+import { FollowRequestNotification } from './notifications.model';
 
-export type AckCallback = (respone: { status: 'ok' | 'error'; message: string }) => void;
-
-export interface ServerToClientEvents {}
+export interface ServerToClientEvents {
+  any: (...args: any[]) => void;
+  followRequestNotification: (content: FollowRequestNotification) => void;
+}
 
 export interface ClientToServerEvents {
-  userConnected: (callback: AckCallback) => void;
-  userDisconnected: (callback: AckCallback) => void;
+  any: (...args: any[]) => void;
 }
 
 export interface SocketAuth {

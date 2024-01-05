@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ClientSocket, SocketAuth } from 'app/models/socket.model';
-import { Socket, io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { UserService } from './user.service';
-import { ackCallback } from 'app/shared/utils/socket';
+import { FollowRequestNotification, Notification } from 'app/models/notifications.model';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,30 +11,52 @@ import { ackCallback } from 'app/shared/utils/socket';
 export class NotificationsService {
   private socket: ClientSocket;
 
+  private readonly newNotificationsSubject = new BehaviorSubject<Notification[]>([]);
+  public readonly newNotifications$ = this.newNotificationsSubject.asObservable();
+
   constructor(private readonly userService: UserService) {
-    this.socket = this.createNewConnection();
+    this.socket = this.createConnection();
   }
 
-  private createNewConnection(userId: string | undefined = undefined): ClientSocket {
+  private createConnection(userId: string | undefined = undefined): ClientSocket {
     return io('https://localhost:8080', { autoConnect: false, auth: { userId } });
+  }
+
+  public onSocketButton(): void {
+    this.socket.connect();
+    this.socket.emit('any');
   }
 
   public get socketAuth(): SocketAuth {
     return this.socket.auth as SocketAuth;
   }
 
-  public startListening(): void {
+  public get isConnected(): boolean {
+    return this.socket?.connected || false;
+  }
+
+  private startListening(): void {
     this.socket.connect();
+
+    this.socket.on('followRequestNotification', (notification: FollowRequestNotification) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.push(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+  }
+
+  public setupSocket(): void {
+    this.startListening();
 
     this.userService.currentUser$.subscribe((user) => {
       if (!user && this.socketAuth.userId !== undefined) {
         this.socket.disconnect();
-        this.socket = this.createNewConnection();
-        this.socket.connect();
+        this.socket = this.createConnection();
+        this.startListening();
       } else if (!!user && this.socketAuth.userId !== user.id) {
         this.socket.disconnect();
-        this.socket = this.createNewConnection(user.id);
-        this.socket.connect();
+        this.socket = this.createConnection(user.id);
+        this.startListening();
       }
     });
   }
@@ -44,9 +67,5 @@ export class NotificationsService {
 
   public disconnect(): void {
     this.socket.disconnect();
-  }
-
-  public get isConnected(): boolean {
-    return this.socket?.connected || false;
   }
 }
