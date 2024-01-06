@@ -33,6 +33,7 @@ import { FollowersComponent } from './components/followers/followers.component';
 import { NotificationsPageComponent } from './components/notifications/notifications-page/notifications-page.component';
 import { Observable } from 'rxjs';
 import { NotificationsService } from './core/services/notifications.service';
+import { NotificationComponent } from './components/notifications/notification/notification.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
   return () => {
@@ -72,7 +73,8 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
     FeedPostComponent,
     ShowProfileComponent,
     FollowersComponent,
-    NotificationsPageComponent
+    NotificationsPageComponent,
+    NotificationComponent
   ],
   imports: [BrowserModule, AppRoutingModule, SharedModule, MaterialModule, MatButtonModule],
   providers: [{

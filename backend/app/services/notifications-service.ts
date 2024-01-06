@@ -4,6 +4,7 @@ import { CustomSocket } from '../utils/socket';
 import { Follower, knexInstance } from '../utils/globals';
 import { v4 as uuidv4 } from 'uuid';
 import { craftError, errorCodes } from '../utils/error';
+import { getProfileByUserId } from '../controllers/ProfileController';
 
 class NotificationsService {
     private readonly userSockets: Record<string, Socket> = {};
@@ -22,11 +23,11 @@ class NotificationsService {
         return this.userSockets[userId];
     }
 
-    public sendFollowRequestNotification(userId: string, follower: Follower): void {
+    public sendFollowRequestNotification(followedBy: string, follower: Follower): void {
         const notification: FollowRequestNotification = {
             id: uuidv4(),
             createdAt: new Date(),
-            userId: userId,
+            userId: followedBy,
             type: NotificationType.FollowRequest,
             content: follower
         };
@@ -37,7 +38,6 @@ class NotificationsService {
                 trx('Notifications')
                     .insert(notification)
                     .then((arr) => {
-                        console.log('arr', arr.length);
                         if (arr.length === 0) {
                             throw {
                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -66,10 +66,12 @@ class NotificationsService {
             )
             .then(() => {
                 // Then, send the notification to the user
-                const socket = this.getSocket(userId);
-                if (!!socket) {
-                    socket.emit('followRequestNotification', notification);
-                }
+                getProfileByUserId(follower.followedBy).then((followerProfile) => {
+                    const socket = this.getSocket(follower.follows);
+                    if (!!socket && !!followerProfile) {
+                        socket.emit('followRequestNotification', { notification, profile: followerProfile });
+                    }
+                });
             });
     }
 }

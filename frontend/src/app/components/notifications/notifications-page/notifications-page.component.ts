@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NotificationsService } from 'app/core/services/notifications.service';
+import { combineLatest, map } from 'rxjs';
 
 @Component({
   selector: 'mds-notifications-page',
@@ -8,6 +9,13 @@ import { NotificationsService } from 'app/core/services/notifications.service';
 })
 export class NotificationsPageComponent {
   public toggleButtonText: string = 'Disconnect';
+  public readonly oldNotifications$ = this.notificationsService
+    .getNotifications()
+    .pipe(map((response) => response.content));
+  public readonly newNotifications$ = this.notificationsService.newNotifications$;
+  public readonly notifications$ = combineLatest([this.oldNotifications$, this.newNotifications$]).pipe(
+    map(([oldNotifications, newNotifications]) => [...newNotifications, ...oldNotifications])
+  );
 
   constructor(private readonly notificationsService: NotificationsService) {}
 

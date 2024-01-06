@@ -1,9 +1,9 @@
 import { Socket } from 'socket.io';
-import { FollowRequestNotification } from './notifications';
+import { NotificationWithData } from './notifications';
 
 export interface ServerToClientEvents {
     any: (...args: any[]) => void;
-    followRequestNotification: (content: FollowRequestNotification) => void;
+    followRequestNotification: (content: NotificationWithData) => void;
 }
 
 export interface ClientToServerEvents {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ClientSocket, SocketAuth } from 'app/models/socket.model';
 import { io } from 'socket.io-client';
 import { UserService } from './user.service';
-import { FollowRequestNotification, Notification } from 'app/models/notifications.model';
+import { NotificationWithData } from 'app/models/notifications.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GenericResponse } from 'app/models/generic-response.model';
 import { HttpClient } from '@angular/common/http';
@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http';
 export class NotificationsService {
   private socket: ClientSocket;
 
-  private readonly newNotificationsSubject = new BehaviorSubject<Notification[]>([]);
+  private readonly newNotificationsSubject = new BehaviorSubject<NotificationWithData[]>([]);
   public readonly newNotifications$ = this.newNotificationsSubject.asObservable();
 
   constructor(private readonly userService: UserService, private readonly httpClient: HttpClient) {
@@ -40,9 +40,9 @@ export class NotificationsService {
   private startListening(): void {
     this.socket.connect();
 
-    this.socket.on('followRequestNotification', (notification: FollowRequestNotification) => {
+    this.socket.on('followRequestNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
-      newNotifications.push(notification);
+      newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
     });
   }
@@ -71,8 +71,8 @@ export class NotificationsService {
     this.socket.disconnect();
   }
 
-  public getNotifications(): Observable<GenericResponse<Notification[]>> {
+  public getNotifications(): Observable<GenericResponse<NotificationWithData[]>> {
     const url = 'api/notifications';
-    return this.httpClient.get<GenericResponse<Notification[]>>(url);
+    return this.httpClient.get<GenericResponse<NotificationWithData[]>>(url);
   }
 }

@@ -1,0 +1,16 @@
+<div [ngSwitch]="notification.type" class="notification-container">
+  <ng-container *ngSwitchCase="notificationType.FollowRequest">
+    <mds-profile-pic
+      [pictureSrc]="profile.profilePictureURL"
+      class="profile-pic"
+      [userId]="notification.userId"
+    ></mds-profile-pic>
+    <div class="content">
+      <span>
+        <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
+        has started following you.
+      </span>
+      <div class="date">{{ dateFormatted }}</div>
+    </div>
+  </ng-container>
+</div>

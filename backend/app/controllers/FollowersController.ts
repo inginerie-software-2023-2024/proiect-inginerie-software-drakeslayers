@@ -71,7 +71,7 @@ export class FollowersController {
                                     content: undefined,
                                 }
                             } else {
-								notificationsService.sendFollowRequestNotification(newFollower.follows, newFollower);
+								notificationsService.sendFollowRequestNotification(newFollower.followedBy, newFollower);
 
                                 return res.status(200).json({ error: undefined, content: newFollower });
                             }
