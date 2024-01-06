@@ -3,7 +3,9 @@ import { ClientSocket, SocketAuth } from 'app/models/socket.model';
 import { io } from 'socket.io-client';
 import { UserService } from './user.service';
 import { FollowRequestNotification, Notification } from 'app/models/notifications.model';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { GenericResponse } from 'app/models/generic-response.model';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,7 @@ export class NotificationsService {
   private readonly newNotificationsSubject = new BehaviorSubject<Notification[]>([]);
   public readonly newNotifications$ = this.newNotificationsSubject.asObservable();
 
-  constructor(private readonly userService: UserService) {
+  constructor(private readonly userService: UserService, private readonly httpClient: HttpClient) {
     this.socket = this.createConnection();
   }
 
@@ -67,5 +69,10 @@ export class NotificationsService {
 
   public disconnect(): void {
     this.socket.disconnect();
+  }
+
+  public getNotifications(): Observable<GenericResponse<Notification[]>> {
+    const url = 'api/notifications';
+    return this.httpClient.get<GenericResponse<Notification[]>>(url);
   }
 }

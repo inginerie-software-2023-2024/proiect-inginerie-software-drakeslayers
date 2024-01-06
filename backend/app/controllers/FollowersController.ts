@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { Follower, User, knexInstance } from '../utils/globals';
 import { craftError, errorCodes } from '../utils/error';
 import { notificationsService } from '../services/notifications-service';
-import { NotificationType } from '../utils/notifications';
 
 function getFollower(follows: string, followedBy: string) {
     return knexInstance('Followers')
@@ -72,10 +71,7 @@ export class FollowersController {
                                     content: undefined,
                                 }
                             } else {
-								notificationsService.sendFollowRequestNotification(newFollower.follows, { 
-                                    type: NotificationType.FollowRequest, 
-                                    content: newFollower 
-                                });
+								notificationsService.sendFollowRequestNotification(newFollower.follows, newFollower);
 
                                 return res.status(200).json({ error: undefined, content: newFollower });
                             }

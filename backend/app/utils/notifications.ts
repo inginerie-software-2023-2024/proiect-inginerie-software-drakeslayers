@@ -5,8 +5,17 @@ export enum NotificationType {
 }
 
 export interface Notification {
+    id: string;
+    createdAt: Date;
+    userId: string;
     type: NotificationType;
-    content: any;
+    content: any | null;
+}
+
+export interface NotificationRecipient {
+    notificationId: string;
+    userId: string;
+    readAt: Date | null;
 }
 
 export interface FollowRequestNotification extends Notification {
