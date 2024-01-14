@@ -1,7 +1,11 @@
-import { Follower, Profile } from './globals';
+import { Follower, Post, Profile } from './globals';
 
 export enum NotificationType {
-    FollowRequest = 'FollowRequest'
+    FollowRequest = 'FollowRequest',
+    PostLike = 'PostLike',
+    CommentLike = 'CommentLike',
+    NewComment = 'NewComment',
+    NewReply = 'NewReply'
 }
 
 export interface Notification {
@@ -25,4 +29,20 @@ export interface NotificationRecipient {
 
 export interface FollowRequestNotification extends Notification {
     content: Follower;
+}
+
+export interface PostLikeNotification extends Notification {
+    content: Post;
+}
+
+export interface CommentLikeNotification extends Notification {
+    content: Post;
+}
+
+export interface NewCommentNotification extends Notification {
+    content: Post;
+}
+
+export interface NewReplyNotification extends Notification {
+    content: Post;
 }

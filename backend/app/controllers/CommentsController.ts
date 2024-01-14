@@ -3,6 +3,7 @@ import { knexInstance, Comment } from '../utils/globals';
 import { Knex } from 'knex';
 import { craftError, errorCodes } from '../utils/error';
 import { v4 as uuidv4 } from 'uuid';
+import { notificationsService } from '../services/notifications-service';
 
 function getComment(id: string): Knex.QueryBuilder {
     return knexInstance('Comments')
@@ -15,6 +16,14 @@ function getCommentOwner(id: string): Knex.QueryBuilder {
     return knexInstance('Comments')
         .select('userId')
         .where('id', id)
+        .first();
+}
+
+export function getCommentPost(id: string): Knex.QueryBuilder {
+    return knexInstance('Comments as c')
+        .select('p.*', 'c.userId as commentOwnerId')
+        .join('Posts as p', 'c.postId', 'p.id')
+        .where('c.id', id)
         .first();
 }
 
@@ -54,7 +63,12 @@ export class CommentsController {
                     comment.parentId = parentId;
                     knexInstance('Comments')
                         .insert(comment)
-                        .then(x => res.status(200).json({ error: undefined, content: comment }));
+                        .then(x => {
+                            if (comment.parentId) {
+                                notificationsService.sendNewReplyNotification(comment, comment.parentId);
+                            }
+                            res.status(200).json({ error: undefined, content: comment })
+                        });
                 })
                 .catch(err => {
                     console.error(err.message);
@@ -65,7 +79,10 @@ export class CommentsController {
 
             knexInstance('Comments')
                 .insert(comment)
-                .then(x => res.status(200).json({ error: undefined, content: comment }))
+                .then(x => {
+                    notificationsService.sendNewCommentNotification(comment);
+                    res.status(200).json({ error: undefined, content: comment })
+                })
                 .catch(err => {
                     console.error(err.message);
                     const error = craftError(errorCodes.other, "Please try commenting again!");

@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, RequestHandler, NextFunction } from 'express';
 import { CommentLike, knexInstance } from '../utils/globals';
 import { craftError, errorCodes } from '../utils/error';
+import { notificationsService } from '../services/notifications-service';
 
 function commentLikeExists(commentLike: CommentLike): Promise<CommentLike> {
     return knexInstance('CommentLikes')
@@ -35,7 +36,10 @@ export class CommentLikesController {
 
                 knexInstance('CommentLikes')
                     .insert(commentLike)
-                    .then(x => res.status(200).json({ error: undefined, content: commentLike }));
+                    .then(x => {
+                        notificationsService.sendCommentLikeNotification(commentLike);
+                        res.status(200).json({ error: undefined, content: commentLike })
+                    });
 
             })
             .catch(err => {
