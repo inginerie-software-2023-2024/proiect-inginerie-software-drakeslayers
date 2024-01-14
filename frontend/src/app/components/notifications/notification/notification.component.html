@@ -13,4 +13,60 @@
       <div class="date">{{ dateFormatted }}</div>
     </div>
   </ng-container>
+  <ng-container *ngSwitchCase="notificationType.PostLike">
+    <mds-profile-pic
+      [pictureSrc]="profile.profilePictureURL"
+      class="profile-pic"
+      [userId]="notification.userId"
+    ></mds-profile-pic>
+    <div class="content">
+      <span>
+        <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
+        has liked your post
+      </span>
+      <div class="date">{{ dateFormatted }}</div>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="notificationType.CommentLike">
+    <mds-profile-pic
+      [pictureSrc]="profile.profilePictureURL"
+      class="profile-pic"
+      [userId]="notification.userId"
+    ></mds-profile-pic>
+    <div class="content">
+      <span>
+        <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
+        has liked your comment
+      </span>
+      <div class="date">{{ dateFormatted }}</div>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="notificationType.NewComment">
+    <mds-profile-pic
+      [pictureSrc]="profile.profilePictureURL"
+      class="profile-pic"
+      [userId]="notification.userId"
+    ></mds-profile-pic>
+    <div class="content">
+      <span>
+        <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
+        commented on your post
+      </span>
+      <div class="date">{{ dateFormatted }}</div>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="notificationType.NewReply">
+    <mds-profile-pic
+      [pictureSrc]="profile.profilePictureURL"
+      class="profile-pic"
+      [userId]="notification.userId"
+    ></mds-profile-pic>
+    <div class="content">
+      <span>
+        <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
+        replied to your comment
+      </span>
+      <div class="date">{{ dateFormatted }}</div>
+    </div>
+  </ng-container>
 </div>

@@ -45,6 +45,30 @@ export class NotificationsService {
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
     });
+
+    this.socket.on('postLikeNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+
+    this.socket.on('commentLikeNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+
+    this.socket.on('newCommentNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+
+    this.socket.on('newReplyNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
   }
 
   public setupSocket(): void {
