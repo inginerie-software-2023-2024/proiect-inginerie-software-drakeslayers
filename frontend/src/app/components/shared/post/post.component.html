@@ -1,0 +1,7 @@
+<a class="post-link" [routerLink]="postId | postLink">
+  <ng-container *ngTemplateOutlet="postTpl"></ng-container>
+</a>
+
+<ng-template #postTpl>
+  <span class="post">{{ type }}</span>
+</ng-template>

@@ -22,7 +22,7 @@
     <div class="content">
       <span>
         <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
-        has liked your post
+        has liked your <mds-post [type]="'post'" [postId]="notification.content.id"></mds-post>
       </span>
       <div class="date">{{ dateFormatted }}</div>
     </div>
@@ -36,7 +36,7 @@
     <div class="content">
       <span>
         <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
-        has liked your comment
+        has liked your <mds-post [type]="'comment'" [postId]="notification.content.id"></mds-post>
       </span>
       <div class="date">{{ dateFormatted }}</div>
     </div>
@@ -50,7 +50,7 @@
     <div class="content">
       <span>
         <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
-        commented on your post
+        commented on your <mds-post [type]="'post'" [postId]="notification.content.id"></mds-post>
       </span>
       <div class="date">{{ dateFormatted }}</div>
     </div>
@@ -64,7 +64,7 @@
     <div class="content">
       <span>
         <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
-        replied to your comment
+        replied to your <mds-post [type]="'comment'" [postId]="notification.content.id"></mds-post>
       </span>
       <div class="date">{{ dateFormatted }}</div>
     </div>

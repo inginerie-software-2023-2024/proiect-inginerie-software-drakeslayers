@@ -34,6 +34,7 @@ import { NotificationsPageComponent } from './components/notifications/notificat
 import { Observable } from 'rxjs';
 import { NotificationsService } from './core/services/notifications.service';
 import { NotificationComponent } from './components/notifications/notification/notification.component';
+import { PostComponent } from './components/shared/post/post.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
   return () => {
@@ -68,6 +69,7 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
     PostCommentsComponent,
     InputSendComponent,
     UsernameComponent,
+    PostComponent,
     PostActionsComponent,
     CommentLikeComponent,
     FeedPostComponent,
