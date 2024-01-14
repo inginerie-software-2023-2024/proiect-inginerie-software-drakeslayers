@@ -247,6 +247,7 @@ class NotificationsService {
     }
 
     public sendNewReplyNotification(comment: Comment, commentAuthorId: string): void {
+        console.log(commentAuthorId)
         if (comment.userId == commentAuthorId) {
             return;
         }

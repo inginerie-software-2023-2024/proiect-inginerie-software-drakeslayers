@@ -64,9 +64,10 @@ export class CommentsController {
                     knexInstance('Comments')
                         .insert(comment)
                         .then(x => {
-                            if (comment.parentId) {
-                                notificationsService.sendNewReplyNotification(comment, comment.parentId);
-                            }
+                            getCommentOwner(comment.parentId!!)
+                                .then(parentOwner => {
+                                    notificationsService.sendNewReplyNotification(comment, parentOwner.userId);
+                                })
                             res.status(200).json({ error: undefined, content: comment })
                         });
                 })
