@@ -12,10 +12,10 @@ export const setupSockets = (httpsServer: https.Server): void => {
     });
 
     io.on('connection', (socket) => {
-        notificationsService.addSocket(socket.handshake.auth.userId, socket);
+        notificationsService.getSocketsService().addSocket(socket.handshake.auth.userId, socket);
 
         socket.on('disconnect', () => {
-            notificationsService.removeSocket(socket.handshake.auth.userId);
+            notificationsService.getSocketsService().removeSocket(socket.handshake.auth.userId);
         });
     });
 };
