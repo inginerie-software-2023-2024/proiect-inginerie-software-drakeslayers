@@ -37,7 +37,7 @@ class ChatService {
                     members.forEach(m => {
                         const socket = this.socketsService.getSocket(m);
                         if (!!socket){
-                            socket.emit('newChatMessage', { chatMessage });
+                            socket.emit('newChatMessage', { chatMessage }, () => knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId: m, chatId}));
                         }
                     })
                })
@@ -45,8 +45,9 @@ class ChatService {
 
     }
 
-    public readMessages(userId: string, chatId: string): Promise<ChatMessage[]>{
-        return knexInstance('ChatUsers')
+    public readMessages(userId: string, chatId: string): Promise<any>{
+        const lastRead = new Promise(resolve => {
+            return knexInstance('ChatUsers')
                 .select('lastRead')
                .where({userId, chatId})
                .first()
@@ -58,13 +59,17 @@ class ChatService {
                         };
                     }
 
-                    return user.lastRead;
-               })
-               .then(date => knexInstance('ChatMessages').where({chatId}).andWhere('sentAt', '>', date))
-               .then((messages) => {
-                    return knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId, chatId})
-                    .then(() => messages);
-                });
+                    return resolve(user.lastRead);
+               });
+        });
+
+        const messages = knexInstance('ChatMessages').where({chatId});
+
+        return Promise.all([lastRead, messages])
+        .then(( [lastRead, messages] ) => {
+            return knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId, chatId})
+            .then(() => ({ lastRead, messages}));
+        });
     }
 
     public createChat(chat: Chat, members: String[]): Promise<any>{
