@@ -4,6 +4,9 @@ import { ClientToServerEvents, ServerToClientEvents } from './socket';
 import { Server } from 'socket.io';
 import { chatService } from '../services/chat-service';
 
+const notificationsOnDisconnect = (userId: string) => notificationsService.getSocketsService().removeSocket(userId);
+const chatOnDisconnect = (userId: string) => chatService.getSocketsService().removeSocket(userId);
+
 export const setupSockets = (httpsServer: https.Server): void => {
     const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpsServer, {
         cors: {
@@ -13,26 +16,19 @@ export const setupSockets = (httpsServer: https.Server): void => {
     });
 
     io.on('connection', (socket) => {
-        notificationsService.getSocketsService().addSocket(socket.handshake.auth.userId, socket);
+        const socketType: string = socket.handshake.auth.socketType;
+        const userId: string  = socket.handshake.auth.userId;
 
-        socket.on('disconnect', () => {
-            notificationsService.getSocketsService().removeSocket(socket.handshake.auth.userId);
-        });
-    });
-
-    const ioChat = new Server(httpsServer, {
-        cors: {
-            origin: 'https://localhost:4200',
-            credentials: true
+        switch (socketType){
+            case 'notifications':
+                notificationsService.getSocketsService().addSocket(userId, socket);
+                socket.on('disconnect', () => notificationsOnDisconnect(userId));
+                break;
+            case 'chat':
+                chatService.getSocketsService().addSocket(userId, socket);
+                socket.on('disconnect', () => chatOnDisconnect(userId));
+                break;
         }
-    });
-
-    ioChat.on('connection', (socket) => {
-        chatService.getSocketsService().addSocket(socket.handshake.auth.userId, socket);
-
-        socket.on('disconnect', () => {
-            chatService.getSocketsService().removeSocket(socket.handshake.auth.userId);
-        });
     });
 
 };
