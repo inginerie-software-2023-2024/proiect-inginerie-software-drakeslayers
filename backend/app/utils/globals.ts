@@ -49,6 +49,7 @@ export interface Profile {
     name: string,
     profilePictureURL: string,
     bio?: string,
+    isPrivate: boolean,
 }
 
 // user information to be used on client
