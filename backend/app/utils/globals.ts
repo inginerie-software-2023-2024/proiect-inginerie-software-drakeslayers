@@ -16,6 +16,7 @@ import { CommentLikesController } from '../controllers/CommentLikesController';
 import { ProfileController, getProfileByUserId } from '../controllers/ProfileController';
 import { FeedController } from '../controllers/FeedController';
 import { NotificationsController } from '../controllers/NotificationsController';
+import { ChatController } from '../controllers/ChatController';
 
 // database connection
 const knexConfig: Knex.Config = {
@@ -319,3 +320,4 @@ export const commentLikeController: CommentLikesController = new CommentLikesCon
 export const profileController: ProfileController = new ProfileController();
 export const feedController: FeedController = new FeedController();
 export const notificationsController: NotificationsController = new NotificationsController();
+export const chatController: ChatController = new ChatController();

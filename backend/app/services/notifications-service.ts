@@ -1,28 +1,22 @@
-import { Socket } from 'socket.io';
+import { SocketsService } from './sockets-service';
 import { CommentLikeNotification, FollowRequestNotification, NewCommentNotification, NewReplyNotification, NotificationRecipient, NotificationType, PostLikeNotification } from '../utils/notifications';
-import { CustomSocket } from '../utils/socket';
 import { CommentLike, Follower, PostLike, Comment, knexInstance } from '../utils/globals';
 import { v4 as uuidv4 } from 'uuid';
 import { craftError, errorCodes } from '../utils/error';
 import { getProfileByUserId } from '../controllers/ProfileController';
 import { getPostById } from '../controllers/PostController';
 import { getCommentPost } from '../controllers/CommentsController';
+import { CustomSocket } from '../utils/socket';
 
 class NotificationsService {
-    private readonly userSockets: Record<string, Socket> = {};
+    private readonly socketsService: SocketsService;
 
-    constructor() {}
-
-    public addSocket(userId: string, socket: Socket): void {
-        this.userSockets[userId] = socket;
+    constructor() {
+        this.socketsService = new SocketsService();
     }
 
-    public removeSocket(userId: string): void {
-        delete this.userSockets[userId];
-    }
-
-    public getSocket(userId: string): CustomSocket | undefined {
-        return this.userSockets[userId];
+    public getSocketsService(){
+        return this.socketsService;
     }
 
     public sendFollowRequestNotification(followedBy: string, follower: Follower): void {
@@ -69,7 +63,7 @@ class NotificationsService {
             .then(() => {
                 // Then, send the notification to the user
                 getProfileByUserId(follower.followedBy).then((followerProfile) => {
-                    const socket = this.getSocket(follower.follows);
+                    const socket = this.socketsService.getSocket(follower.follows) as CustomSocket;
                     if (!!socket && !!followerProfile) {
                         socket.emit('followRequestNotification', { notification, profile: followerProfile });
                     }
@@ -122,7 +116,7 @@ class NotificationsService {
                 .then(() => {
                     // Then, send the notification to the user
                     getProfileByUserId(postLike.userId).then((userProfile) => {
-                        const socket = this.getSocket(post.userId);
+                        const socket = this.socketsService.getSocket(post.userId) as CustomSocket;
                         if (!!socket && !!userProfile) {
                             socket.emit('postLikeNotification', { notification, profile: userProfile });
                         }
@@ -180,7 +174,7 @@ class NotificationsService {
                 .then(() => {
                     // Then, send the notification to the user
                     getProfileByUserId(commentLike.userId).then((userProfile) => {
-                        const socket = this.getSocket(commentOwnerId);
+                        const socket = this.socketsService.getSocket(commentOwnerId) as CustomSocket;
                         if (!!socket && !!userProfile) {
                             socket.emit('postLikeNotification', { notification, profile: userProfile });
                         }
@@ -237,7 +231,7 @@ class NotificationsService {
                 .then(() => {
                     // Then, send the notification to the user
                     getProfileByUserId(comment.userId).then((userProfile) => {
-                        const socket = this.getSocket(post.userId);
+                        const socket = this.socketsService.getSocket(post.userId) as CustomSocket;
                         if (!!socket && !!userProfile) {
                             socket.emit('newCommentNotification', { notification, profile: userProfile });
                         }
@@ -295,7 +289,7 @@ class NotificationsService {
                 .then(() => {
                     // Then, send the notification to the user
                     getProfileByUserId(comment.userId).then((userProfile) => {
-                        const socket = this.getSocket(commentAuthorId);
+                        const socket = this.socketsService.getSocket(commentAuthorId) as CustomSocket;
                         if (!!socket && !!userProfile) {
                             socket.emit('newReplyNotification', { notification, profile: userProfile });
                         }

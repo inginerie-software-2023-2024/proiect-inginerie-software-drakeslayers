@@ -20,6 +20,7 @@ import { swaggerDocument } from '../openAPI/swagger';
 import { feedRouter } from './routes/FeedRoutes';
 import { setupSockets } from './utils/sockets-setup';
 import { notificationRouter } from './routes/NotificationRoutes';
+import { chatRouter } from './routes/ChatRoutes';
 
 const app: Express = express();
 const port: number = 8080;
@@ -79,6 +80,7 @@ app.use(postLikeRouter);
 app.use(commentLikeRouter);
 app.use(feedRouter);
 app.use(notificationRouter);
+app.use(chatRouter);
 
 const httpsServer = https.createServer(options, app);
 setupSockets(httpsServer);
