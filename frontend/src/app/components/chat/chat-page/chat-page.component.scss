@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.conversations-list-container {
+  flex: 1 1 auto;
+  height: 100%;
+  border-right: 1px solid red;
+}
+
+.chat-container {
+  flex: 6 1 auto;
+  height: 100%;
+}

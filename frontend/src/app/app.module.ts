@@ -35,6 +35,9 @@ import { Observable } from 'rxjs';
 import { NotificationsService } from './core/services/notifications.service';
 import { NotificationComponent } from './components/notifications/notification/notification.component';
 import { PostComponent } from './components/shared/post/post.component';
+import { ChatPageComponent } from './components/chat/chat-page/chat-page.component';
+import { ConversationsListComponent } from './components/chat/conversations-list/conversations-list.component';
+import { ChatComponent } from './components/chat/chat/chat.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
   return () => {
@@ -43,7 +46,7 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
       observer.next();
       observer.complete();
     });
-  }
+  };
 }
 
 @NgModule({
@@ -76,15 +79,20 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
     ShowProfileComponent,
     FollowersComponent,
     NotificationsPageComponent,
-    NotificationComponent
+    NotificationComponent,
+    ChatPageComponent,
+    ConversationsListComponent,
+    ChatComponent
   ],
   imports: [BrowserModule, AppRoutingModule, SharedModule, MaterialModule, MatButtonModule],
-  providers: [{
-    provide: APP_INITIALIZER,
-    useFactory: initializeAppFactory,
-    deps: [NotificationsService],
-    multi: true
-  }],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAppFactory,
+      deps: [NotificationsService],
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
