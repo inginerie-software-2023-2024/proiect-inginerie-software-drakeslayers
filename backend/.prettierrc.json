@@ -1,0 +1,23 @@
+{
+  "printWidth": 120,
+  "tabWidth": 4,
+  "bracketSpacing": true,
+  "semi": false,
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": {
+        "semi": true,
+        "singleQuote": true,
+        "parser": "babel-ts",
+        "trailingComma": "none"
+      }
+    },
+    {
+      "files": "*.html",
+      "options": {
+        "htmlWhitespaceSensitivity": "ignore"
+      }
+    }
+  ]
+}

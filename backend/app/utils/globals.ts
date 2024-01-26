@@ -15,6 +15,7 @@ import { PostLikesController } from '../controllers/PostLikesController';
 import { CommentLikesController } from '../controllers/CommentLikesController'; 
 import { ProfileController, getProfileByUserId } from '../controllers/ProfileController';
 import { FeedController } from '../controllers/FeedController';
+import { NotificationsController } from '../controllers/NotificationsController';
 
 // database connection
 const knexConfig: Knex.Config = {
@@ -92,6 +93,7 @@ export interface Comment{
     content: string,
     parentId?: string,
 }
+
 
 export interface CommentLike { 
     userId: string,
@@ -316,3 +318,4 @@ export const postLikeController: PostLikesController = new PostLikesController()
 export const commentLikeController: CommentLikesController = new CommentLikesController();
 export const profileController: ProfileController = new ProfileController();
 export const feedController: FeedController = new FeedController();
+export const notificationsController: NotificationsController = new NotificationsController();

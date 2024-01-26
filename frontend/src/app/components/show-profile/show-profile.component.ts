@@ -10,15 +10,15 @@ import { ProfilePost } from 'app/models/profile-post.model';
 import { Profile } from 'app/models/profile.model';
 import { SessionUser } from 'app/models/session-user.model';
 import { ErrorResponse, handleError } from 'app/shared/utils/error';
-import { Observable, Subscription, catchError, map, of, switchMap } from 'rxjs';
+import { SubscriptionCleanup } from 'app/shared/utils/subscription-cleanup';
+import { Observable, catchError, map, of, switchMap, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-show-profile',
   templateUrl: './show-profile.component.html',
   styleUrls: ['./show-profile.component.scss']
 })
-export class ShowProfileComponent implements OnInit, OnDestroy {
-  private sub: Subscription = new Subscription();
+export class ShowProfileComponent extends SubscriptionCleanup implements OnInit, OnDestroy {
   public readonly currentUser$: Observable<SessionUser | null | undefined> = this.userService.currentUser$;
   public isCurrentUserProfile$!: Observable<boolean>;
   public isFollowing$!: Observable<boolean>;
@@ -35,79 +35,63 @@ export class ShowProfileComponent implements OnInit, OnDestroy {
     private readonly followerService: FollowerService,
     private activatedRoute: ActivatedRoute,
     public readonly router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.sub.add(
-      this.activatedRoute.params.subscribe((params) => {
-        console.log(params);
-        this.getProfile(params['userId']);
-      })
-    );
-    this.sub.add(
-      this.activatedRoute.params.subscribe((params) => {
-        this.getPosts(params['userId']);
-      })
-    );
+  ) {
+    super();
   }
 
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
+  ngOnInit(): void {
+    this.activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      this.getProfile(params['userId']);
+    });
+    this.activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      this.getPosts(params['userId']);
+    });
   }
 
   private getProfile(userId: string): void {
-    this.sub.add(
-      this.profileService
-        .getProfile(userId)
-        .pipe(handleError())
-        .subscribe((response) => {
-          this.profile = response.content;
-          this.getProfilePicture();
+    this.profileService
+      .getProfile(userId)
+      .pipe(takeUntil(this.destroy$), handleError())
+      .subscribe((response) => {
+        this.profile = response.content;
+        this.getProfilePicture();
 
-          // Verificăm dacă profilul este profilul utilizatorului curent
-          this.isCurrentUserProfile$ = this.isCurrentUser(userId);
+        // Verificăm dacă profilul este profilul utilizatorului curent
+        this.isCurrentUserProfile$ = this.isCurrentUser(userId);
 
-          // Verificăm dacă utilizatorul curent urmărește profilul
-          this.isFollowing$ = this.isFollowing(userId);
-        })
-    );
+        // Verificăm dacă utilizatorul curent urmărește profilul
+        this.isFollowing$ = this.isFollowing(userId);
+      });
   }
 
   private getPosts(userId: string): void {
-    this.sub.add(
-      this.postService
-        .getPostsByUser(userId)
-        .pipe(handleError())
-        .subscribe((response) => {
-          this.posts = response.content;
+    this.postService
+      .getPostsByUser(userId)
+      .pipe(takeUntil(this.destroy$), handleError())
+      .subscribe((response) => {
+        this.posts = response.content;
 
-          // Add urls to pictures
-          this.posts.forEach((post) => {
-            this.sub.add(
-              this.postService
-                .getPostMedia(post.id)
-                .pipe(handleError())
-                .subscribe((response) => (post.picturesURLs = response.content?.picturesURLs))
-            );
-          });
+        // Add urls to pictures
+        this.posts.forEach((post) => {
+          this.postService
+            .getPostMedia(post.id)
+            .pipe(takeUntil(this.destroy$), handleError())
+            .subscribe((response) => (post.picturesURLs = response.content?.picturesURLs));
+        });
 
-          // Get the number of likes and comments for each post
-          this.posts.forEach((post) => {
-            this.sub.add(
-              this.postLikeService
-                .getPostLikesCount(post.id)
-                .pipe(handleError())
-                .subscribe((response) => (post.likesCount = response.content?.count))
-            );
-            this.sub.add(
-              this.commentService
-                .getPostCommentsCount(post.id)
-                .pipe(handleError())
-                .subscribe((response) => (post.commentsCount = response.content?.count))
-            );
-          });
-        })
-    );
+        // Get the number of likes and comments for each post
+        this.posts.forEach((post) => {
+          this.postLikeService
+            .getPostLikesCount(post.id)
+            .pipe(takeUntil(this.destroy$), handleError())
+            .subscribe((response) => (post.likesCount = response.content?.count));
+
+          this.commentService
+            .getPostCommentsCount(post.id)
+            .pipe(takeUntil(this.destroy$), handleError())
+            .subscribe((response) => (post.commentsCount = response.content?.count));
+        });
+      });
   }
 
   private getProfilePicture(): void {
@@ -115,12 +99,10 @@ export class ShowProfileComponent implements OnInit, OnDestroy {
       return;
     }
     const profileId = this.profile.id;
-    this.sub.add(
-      this.profileService
-        .getProfilePicture(profileId)
-        .pipe(handleError())
-        .subscribe((response) => (this.profilePictureUrl = response.content?.profilePictureURL))
-    );
+    this.profileService
+      .getProfilePicture(profileId)
+      .pipe(takeUntil(this.destroy$), handleError())
+      .subscribe((response) => (this.profilePictureUrl = response.content?.profilePictureURL));
   }
 
   private isCurrentUser(userId: string): Observable<boolean> {
@@ -159,18 +141,24 @@ export class ShowProfileComponent implements OnInit, OnDestroy {
     if (!this.profile) {
       return;
     }
-    this.followerService.follow(this.profile.userId).subscribe((response) => {
-      this.isFollowing$ = of(true);
-    });
+    this.followerService
+      .follow(this.profile.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((response) => {
+        this.isFollowing$ = of(true);
+      });
   }
 
   public unfollow() {
     if (!this.profile) {
       return;
     }
-    this.followerService.unfollow(this.profile.userId).subscribe((response) => {
-      this.isFollowing$ = of(false);
-    });
+    this.followerService
+      .unfollow(this.profile.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((response) => {
+        this.isFollowing$ = of(false);
+      });
   }
 
   public openPost(postId: String): void {

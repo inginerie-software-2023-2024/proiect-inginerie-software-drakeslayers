@@ -5,6 +5,8 @@
   <button (click)="logout()">Logout</button>
 </div>
 
+<button id="socket-button" (click)="onSocketButton()">Emit socket event</button>
+
 <form *ngIf="!userInfo" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <div>
     <label for="email">Email</label>

@@ -3,7 +3,9 @@ export function formatInstagramTimestamp(timestamp: string) {
   const postDate = new Date(timestamp);
   const timeDiffInSeconds = Math.floor((currentDate.getTime() - postDate.getTime()) / 1000); // Time difference in seconds
 
-  if (timeDiffInSeconds < 60) {
+  if (timeDiffInSeconds === 0) {
+    return 'Just now'; // Just now
+  } else if (timeDiffInSeconds < 60) {
     return `${timeDiffInSeconds}s ago`; // Less than a minute ago
   } else if (timeDiffInSeconds < 3600) {
     const minutes = Math.floor(timeDiffInSeconds / 60);

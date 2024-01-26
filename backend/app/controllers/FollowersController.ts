@@ -1,6 +1,7 @@
-import express, { Express, Request, Response, RequestHandler, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Follower, User, knexInstance } from '../utils/globals';
 import { craftError, errorCodes } from '../utils/error';
+import { notificationsService } from '../services/notifications-service';
 
 function getFollower(follows: string, followedBy: string) {
     return knexInstance('Followers')
@@ -70,6 +71,8 @@ export class FollowersController {
                                     content: undefined,
                                 }
                             } else {
+								notificationsService.sendFollowRequestNotification(newFollower.followedBy, newFollower);
+
                                 return res.status(200).json({ error: undefined, content: newFollower });
                             }
                         })
@@ -171,7 +174,7 @@ export class FollowersController {
                     content: undefined,
                 }
             })
-            .then(() => getFollower(req.session.user!.id, req.params.userId))
+            .then(() => getFollower(req.params.userId, req.session.user!.id))
             .then((follower: Follower) => {
                 if (!follower) {
                     throw {
@@ -180,7 +183,7 @@ export class FollowersController {
                     }
                 }
 
-                if (follower.follows !== req.session.user!.id) {
+                if (follower.followedBy !== req.session.user!.id) {
                     throw {
                         error: craftError(errorCodes.unAuthorized, "Cannot delete follow on behalf of another user!"),
                         content: undefined,
