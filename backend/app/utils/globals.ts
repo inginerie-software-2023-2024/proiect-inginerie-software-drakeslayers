@@ -24,9 +24,9 @@ const knexConfig: Knex.Config = {
     connection: {
         host: '127.0.0.1',
         port: 5432,
-        user: 'brontosaur',
-        password: '1234',
-        database: 'dbMDS'
+        user: 'admin',
+        password: 'password',
+        database: 'dbmds'
     },
 };
 
@@ -49,6 +49,7 @@ export interface Profile {
     name: string,
     profilePictureURL: string,
     bio?: string,
+    hashtags?: string[],
 }
 
 // user information to be used on client
@@ -79,6 +80,7 @@ export interface Post {
     userId: string,
     description?: string,
     picturesURLs: string[],
+    hashtags: string[],
 }
 
 export interface PostLike {
