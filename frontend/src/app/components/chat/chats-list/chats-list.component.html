@@ -1,0 +1,21 @@
+<div class="new-chat-btn-container">
+  <h5 class="title">Chats</h5>
+  <div class="spacer"></div>
+  <button mat-raised-button class="new-chat-btn">
+    <mat-icon>add</mat-icon>
+    New Chat
+  </button>
+</div>
+
+<div class="chats-list-container">
+  <ng-container *ngIf="1 < 0; else noChats"></ng-container>
+</div>
+
+<ng-template #noChats>
+  <div class="spacer"></div>
+  <div class="no-chats-container">
+    <p class="faded-p">You don't have any conversations yet.</p>
+    <p class="faded-p">Try starting a new chat.</p>
+  </div>
+  <div class="spacer"></div>
+</ng-template>

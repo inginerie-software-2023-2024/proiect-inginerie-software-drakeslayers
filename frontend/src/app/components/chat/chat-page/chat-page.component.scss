@@ -1,13 +1,17 @@
+@use "variables" as *;
+
 :host {
   display: flex;
   flex-direction: row;
   height: 100%;
 }
 
-.conversations-list-container {
+.chats-list-container {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
-  height: 100%;
-  border-right: 1px solid red;
+  max-width: 400px;
+  border-right: $separator-300;
 }
 
 .chat-container {

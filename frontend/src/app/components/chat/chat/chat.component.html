@@ -1,1 +1,10 @@
-<p>chat works!</p>
+<ng-container *ngIf="1 < 0; else noChatOpened"></ng-container>
+
+<ng-template #noChatOpened>
+  <div class="spacer"></div>
+  <div class="no-chat-opened-container">
+    <p class="faded-p">No conversation opened.</p>
+    <p class="faded-p">Try opening a chat.</p>
+  </div>
+  <div class="spacer"></div>
+</ng-template>

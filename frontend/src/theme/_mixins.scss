@@ -34,3 +34,12 @@
   @include icon-button($size);
   @include mat-icon($size);
 }
+
+@mixin spacer {
+  flex: 1 1 auto;
+}
+
+@mixin faded-p {
+  color: $gray-500;
+  margin: 0;
+}
