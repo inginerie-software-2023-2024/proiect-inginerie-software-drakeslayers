@@ -166,6 +166,33 @@ const multerProfiles = multer.diskStorage({
 // middleware for uploading profiles
 export const uploadProfiles: Multer = multer({ storage: multerProfiles });
 
+const multerChats = multer.diskStorage({
+    destination: (req: Request, file, cb) => {
+        // resources/chats/{pictureID}.extension
+        let dir = craftChatPicturesDest();
+        console.log(dir);
+        fs.mkdir(dir, { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+            cb(
+                null,
+                dir
+                );
+        });
+    },
+
+    filename: (req: Request, file, cb) => {
+        cb(
+            null,
+            uuidv4() + path.extname(file.originalname)
+        );
+    }
+});
+
+// middleware for uploading profiles
+export const uploadChats: Multer = multer({ storage: multerChats });
+
 export function deleteFiles(files: string[], callback: Function) {
     var i = files.length;
     files.forEach(function (filepath) {
@@ -187,6 +214,10 @@ export function craftPictureDest(userId: string): string {
 
 export function craftProfilePictureDest(userId: string): string {
     return path.join("resources/users/", userId, "profile/");
+}
+
+export function craftChatPicturesDest(): string {
+    return path.join("resources/chats/");
 }
 
 export function craftProfilePictureURL(userId: string, pictureName: string): string {
@@ -270,7 +301,7 @@ export function uploadMediaProfiles(req: Request, res: Response, next: NextFunct
 }
 
 export function uploadMediaChatPicture(req: Request, res: Response, next: NextFunction) {
-    const upload = uploadProfiles.single('media');
+    const upload = uploadChats.single('media');
 
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
