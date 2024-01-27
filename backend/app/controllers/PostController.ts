@@ -24,6 +24,13 @@ function getPostMetaData(post: Post): Partial<Post> {
     return postMetaData;
 }
 
+export async function getPostById(postId: string): Promise<Post> {
+    const post: Post = await knexInstance('Posts')
+        .where({ id:postId })
+        .first();
+    return post;
+}
+
 function getPostOwner(id: string): Promise<Partial<Post> | undefined> {
     return knexInstance
         .select('userId', 'picturesURLs')

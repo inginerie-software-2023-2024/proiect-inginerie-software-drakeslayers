@@ -7,8 +7,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormControlErrorMessagePipe } from './pipes/form-control-error-message.pipe';
 import { ProfileLinkPipe } from './pipes/profile-link.pipe';
 import { ApiPrefixPipe } from './pipes/api-prefix.pipe';
+import { PostLinkPipe } from './pipes/post-link.pipe';
 
-const PIPES = [FormControlErrorMessagePipe, ProfileLinkPipe, ApiPrefixPipe];
+const PIPES = [FormControlErrorMessagePipe, ProfileLinkPipe, PostLinkPipe, ApiPrefixPipe];
 
 @NgModule({
   exports: [

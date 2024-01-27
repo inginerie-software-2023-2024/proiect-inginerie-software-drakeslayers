@@ -1,11 +1,8 @@
 import express, { Express } from 'express';
 
-
-import RedisStore from "connect-redis";
-import session from "express-session";
-import { createClient } from "redis";
-
-
+import RedisStore from 'connect-redis';
+import session from 'express-session';
+import { createClient } from 'redis';
 
 import cors from 'cors';
 import https from 'https';
@@ -21,6 +18,9 @@ import { commentLikeRouter } from './routes/CommentLikeRoutes';
 import swaggerUI from 'swagger-ui-express';
 import { swaggerDocument } from '../openAPI/swagger';
 import { feedRouter } from './routes/FeedRoutes';
+import { setupSockets } from './utils/sockets-setup';
+import { notificationRouter } from './routes/NotificationRoutes';
+import { chatRouter } from './routes/ChatRoutes';
 
 const app: Express = express();
 const port: number = 8080;
@@ -37,35 +37,34 @@ redisClient.connect().catch(console.error);
 
 let redisStore = new RedisStore({
     client: redisClient,
-    prefix: "proiectmds:",
+    prefix: 'proiectmds:'
 });
 
 app.use(express.static('resources'));
-
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // cookie options
 app.use(
     session({
-        name: "dinoSnack",
+        name: 'dinoSnack',
         store: redisStore,
         resave: false,
         saveUninitialized: false,
-        secret: "brontosaurus",
+        secret: 'brontosaurus',
         cookie: {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: 'strict'
         }
     })
 );
 
 app.use(
     cors({
-        origin: "https://www.promeret.social",
-        methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-        credentials: true,
+        origin: 'https://www.promeret.social',
+        methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
+        credentials: true
     })
 );
 
@@ -80,9 +79,11 @@ app.use(profileRouter);
 app.use(postLikeRouter);
 app.use(commentLikeRouter);
 app.use(feedRouter);
+app.use(notificationRouter);
+app.use(chatRouter);
 
 const httpsServer = https.createServer(options, app);
+setupSockets(httpsServer);
 httpsServer.listen(port, () => {
-    console.log(`Process pid: ${process.pid}`)
-    console.log(`Server listening on https://localhost:${port}`);
+    console.log(`Server listening on port ${port}`);
 });

@@ -15,6 +15,8 @@ import { PostLikesController } from '../controllers/PostLikesController';
 import { CommentLikesController } from '../controllers/CommentLikesController'; 
 import { ProfileController, getProfileByUserId } from '../controllers/ProfileController';
 import { FeedController } from '../controllers/FeedController';
+import { NotificationsController } from '../controllers/NotificationsController';
+import { ChatController } from '../controllers/ChatController';
 
 // database connection
 const knexConfig: Knex.Config = {
@@ -95,6 +97,7 @@ export interface Comment{
     parentId?: string,
 }
 
+
 export interface CommentLike { 
     userId: string,
     commentId: string,
@@ -165,6 +168,33 @@ const multerProfiles = multer.diskStorage({
 // middleware for uploading profiles
 export const uploadProfiles: Multer = multer({ storage: multerProfiles });
 
+const multerChats = multer.diskStorage({
+    destination: (req: Request, file, cb) => {
+        // resources/chats/{pictureID}.extension
+        let dir = craftChatPicturesDest();
+        console.log(dir);
+        fs.mkdir(dir, { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+            cb(
+                null,
+                dir
+                );
+        });
+    },
+
+    filename: (req: Request, file, cb) => {
+        cb(
+            null,
+            uuidv4() + path.extname(file.originalname)
+        );
+    }
+});
+
+// middleware for uploading profiles
+export const uploadChats: Multer = multer({ storage: multerChats });
+
 export function deleteFiles(files: string[], callback: Function) {
     var i = files.length;
     files.forEach(function (filepath) {
@@ -186,6 +216,10 @@ export function craftPictureDest(userId: string): string {
 
 export function craftProfilePictureDest(userId: string): string {
     return path.join("resources/users/", userId, "profile/");
+}
+
+export function craftChatPicturesDest(): string {
+    return path.join("resources/chats/");
 }
 
 export function craftProfilePictureURL(userId: string, pictureName: string): string {
@@ -268,6 +302,28 @@ export function uploadMediaProfiles(req: Request, res: Response, next: NextFunct
     })
 }
 
+export function uploadMediaChatPicture(req: Request, res: Response, next: NextFunction) {
+    const upload = uploadChats.single('media');
+
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            if (err.message === 'Unexpected field') {
+                const error = craftError(errorCodes.failedToUpload, "Too many files!");
+                return res.status(400).json({ error, content: undefined });
+            }
+            // A Multer error occurred when uploading.
+            const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
+            return res.status(500).json({ error, content: undefined });
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
+            return res.status(500).json({ error, content: undefined });
+        }
+        // Everything went fine. 
+        return next();
+    })
+}
+
 // middleware to verify if a profile exists
 export function ProfileExists(req: Request, res: Response, next: NextFunction) {
     console.log("sunt in profile exists");
@@ -318,3 +374,5 @@ export const postLikeController: PostLikesController = new PostLikesController()
 export const commentLikeController: CommentLikesController = new CommentLikesController();
 export const profileController: ProfileController = new ProfileController();
 export const feedController: FeedController = new FeedController();
+export const notificationsController: NotificationsController = new NotificationsController();
+export const chatController: ChatController = new ChatController();

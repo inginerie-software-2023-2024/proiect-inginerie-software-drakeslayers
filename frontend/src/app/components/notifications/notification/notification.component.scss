@@ -1,0 +1,24 @@
+@use "typography-levels" as typography-levels;
+@use "variables" as *;
+@use "colors" as *;
+
+:host {
+  display: block;
+}
+
+.notification-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+  border: $separator-300;
+}
+
+.profile-pic {
+  margin-right: 8px;
+}
+
+.date {
+  @include typography-levels.small();
+  color: $gray-600;
+}

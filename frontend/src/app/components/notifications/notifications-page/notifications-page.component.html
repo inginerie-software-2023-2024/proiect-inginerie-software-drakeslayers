@@ -1,0 +1,5 @@
+<div class="notifications">
+  <div *ngFor="let notification of notifications$ | async">
+    <mds-notification [notification]="notification.notification" [profile]="notification.profile"></mds-notification>
+  </div>
+</div>

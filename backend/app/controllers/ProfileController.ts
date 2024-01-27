@@ -19,20 +19,49 @@ function getProfileMetaData(profile: Profile): Partial<Profile> {
     return profileMetaData;
 }
 
-export function getProfileByUserId(userId: string): Promise<Partial<Profile> | undefined> {
+export function getProfileByUserId(userId: string): Promise<Profile | undefined> {
     return knexInstance
-        .select('id', 'profilePictureURL')
+        .select('*')
         .from('Profiles')
         .where('userId', userId)
         .then(x => {
             if (x.length === 0) {
                 return undefined;
             }
-            const res: Partial<Profile> = {
+            const res: Profile = {
                 id: x[0].id,
-                profilePictureURL: x[0].profilePictureURL
+                userId: userId,
+                username: x[0].username,
+                name: x[0].name,
+                profilePictureURL: craftProfilePictureURL(userId, x[0].profilePictureURL),
+                bio: x[0].bio
             };
             return res;
+        })
+        .catch(err => {
+            console.error(err.message);
+            return undefined;
+        });
+}
+
+export function getProfilesInRange(userIdList: string[]): Promise<Profile[] | undefined> {
+    return knexInstance
+        .select('*')
+        .from('Profiles')
+        .whereIn('userId', userIdList)
+        .then(x => {
+            if (x.length === 0) {
+                return undefined;
+            }
+
+            return x.map(profile => ({
+                id: profile.id,
+                userId: profile.userId,
+                username: profile.username,
+                name: profile.name,
+                profilePictureURL: craftProfilePictureURL(profile.userId, profile.profilePictureURL),
+                bio: profile.bio
+            }));
         })
         .catch(err => {
             console.error(err.message);
@@ -80,6 +109,20 @@ export class ProfileController {
                 const error = craftError(errorCodes.other, "Please try again!");
                 return res.status(500).json({ error, content: undefined });
             })
+    }
+
+    searchProfiles(req: Request, res: Response, next: NextFunction){
+        const name: string = req.query.name as string;
+        return knexInstance('Profiles')
+            .select('*')
+            .where('username', 'like', `%${name}%`)
+            .orWhere('name', 'like', `%${name}%`)
+            .then((profiles: Profile[]) => res.status(200).json({ error: undefined, content: profiles }))
+            .catch(err => {
+                console.error(err.message);
+                const error = craftError(errorCodes.other, "Please try again!");
+                return res.status(500).json({ error, content: undefined });
+            });
     }
 
     getProfilePicture(req: Request, res: Response, next: NextFunction) {
