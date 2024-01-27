@@ -3,8 +3,7 @@ import { chatService } from "../services/chat-service";
 import { Chat } from "../utils/chat";
 import { v4 as uuidv4 } from 'uuid';
 import { craftError, errorCodes } from "../utils/error";
-
-const defaultPictureUrl = "defaultImage.png";
+import { defaultProfilePictureURL } from './ProfileController';
 
 export class ChatController {
     createChat(req: Request, res: Response, next: NextFunction) {
@@ -24,7 +23,7 @@ export class ChatController {
             name: req.body.name,
             createdAt: new Date(),
             isGroup: req.body.isGroup,
-            pictureUrl: req.file === undefined ? defaultPictureUrl : req.file.filename,
+            pictureUrl: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
         };
 
         const members: String[] = [req.session.user!.id];

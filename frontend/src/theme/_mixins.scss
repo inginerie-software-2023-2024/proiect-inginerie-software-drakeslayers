@@ -32,7 +32,10 @@
 
 @mixin mat-icon-button($size) {
   @include icon-button($size);
-  @include mat-icon($size);
+
+  mat-icon {
+    @include mat-icon($size);
+  }
 }
 
 @mixin spacer {

@@ -1,4 +1,6 @@
+@use "colors" as *;
 @use "mixins" as *;
+@use "variables" as *;
 
 :host {
   display: flex;
@@ -13,12 +15,70 @@
 
 .faded-p {
   @include faded-p;
+  text-align: center;
 }
 
 .search-users-form {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+
+  .chip-grid {
+    max-height: 120px;
+    overflow: auto;
+  }
+
+  input:-webkit-autofill {
+    -webkit-background-clip: text;
+  }
+}
+
+.users-list {
+  overflow: auto;
+  padding-bottom: 1px; // bottom border of the last user is cut off without this
+}
+
+.user-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+  border: $separator-300;
+  border-radius: 8px;
+
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
+
+  .name-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 8px;
+  }
+
+  .toggle-user-btn {
+    @include mat-icon-button(32px);
+
+    mat-icon {
+      position: absolute;
+      right: 0;
+    }
+  }
+}
+
+.action-btns {
+  display: flex;
+  flex-direction: row;
+  margin-top: 16px;
+
+  .cancel-btn {
+    flex: 1;
+  }
+
+  .create-btn {
+    flex: 2;
+    margin-left: 16px;
+    color: $very-light-text-color;
+  }
 }
 
 .start-typing, .no-users {

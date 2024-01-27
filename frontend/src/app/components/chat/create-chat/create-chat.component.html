@@ -1,22 +1,61 @@
+<!-- Search bar -->
 <form class="search-users-form" [formGroup]="searchUsersForm">
-  <mat-form-field class="search-users-form-field">
-    <input matInput placeholder="Search for users" formControlName="username" />
-    <mat-icon matSuffix>search</mat-icon>
+  <mat-form-field>
+    <mat-chip-grid #chipGrid class="chip-grid">
+      <mat-chip-row *ngFor="let profile of addedProfiles" (removed)="removeUser(profile)">
+        {{ profile.username }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+      <input placeholder="Search for users" formControlName="name" [matChipInputFor]="chipGrid" />
+    </mat-chip-grid>
   </mat-form-field>
 </form>
 
-<ng-container *ngIf="username.length >= 3; else startTyping">
-  <ng-container *ngIf="1 < 0; else noUsers"></ng-container>
+<!-- Users list -->
+<ng-container *ngIf="name.length >= 3; else startTyping">
+  <ng-container *ngIf="profiles.length > 0; else noUsers">
+    <div class="users-list">
+      <div *ngFor="let profile of profiles" class="user-container">
+        <mds-profile-pic [pictureSrc]="profile.profilePictureURL"></mds-profile-pic>
+        <div class="name-container">
+          <mds-username [username]="profile.username"></mds-username>
+          <span class="faded-p">{{ profile.name }}</span>
+        </div>
+        <div class="spacer"></div>
+        <button mat-icon-button class="toggle-user-btn" (click)="toggleUser(profile)">
+          <mat-icon *ngIf="!addedProfilesIds.includes(profile.id); else removeUser" class="btn-icon add">add</mat-icon>
+          <ng-template #removeUser>
+            <mat-icon class="btn-icon remove" color="warn">close</mat-icon>
+          </ng-template>
+        </button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <!-- Spacer to push the action buttons to the bottom -->
+  </ng-container>
 </ng-container>
 
+<!-- Action buttons -->
+<div class="action-btns">
+  <button mat-flat-button class="cancel-btn" color="warn" mat-dialog-close>Cancel</button>
+  <button mat-flat-button class="create-btn" color="primary" [disabled]="addedProfiles.length === 0">
+    Create chat
+  </button>
+</div>
+
+<!-- Indicate that you need to type more than 3 characters -->
 <ng-template #startTyping>
   <div class="start-typing">
     <div class="spacer"></div>
     <p class="faded-p">Start typing at least 3 letters.</p>
+    <p class="faded-p">You can search for users by their name or username.</p>
     <div class="spacer"></div>
   </div>
 </ng-template>
 
+<!-- Indicate that no users were found -->
 <ng-template #noUsers>
   <div class="no-users">
     <div class="spacer"></div>
