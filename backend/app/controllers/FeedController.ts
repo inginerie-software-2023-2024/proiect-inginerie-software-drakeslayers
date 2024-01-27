@@ -1,14 +1,73 @@
 import express, { Express, Request, Response, RequestHandler, NextFunction } from 'express';
-import { getAllFollowing } from './FollowersController';
+import { getAllFollowing, isAcceptedFollower } from './FollowersController';
 import { Follower, Post, User, knexInstance } from '../utils/globals';
 import { getPostsByUser } from './PostController';
 import { craftError, errorCodes } from '../utils/error';
 import path from 'path';
+import { isPrivate } from './ProfileController';
 
 function getAllUsers() {
     return knexInstance('Users')
         .select("*");
 }
+
+
+function filterPrivateUsers(requestingUserId: string, users: User[]): Promise<User[]>{
+
+    const promises: Promise<undefined>[] = [];
+    const result: User[] = [];
+
+    users.forEach(u => {
+        promises.push(new Promise(resolve => {
+            return isPrivate(u.id)
+            .then(res => {
+                if (!res)
+                    return false;
+        
+                return isAcceptedFollower(requestingUserId, u.id);
+            })
+            .then(cannotSee => {
+                if (!cannotSee){
+                    result.push(u);
+                }
+
+                return resolve(undefined);
+            });;
+        }))
+    });
+
+    return Promise.all(promises)
+    .then(() => result);
+}
+
+function filterPrivateFollowing(requestingUserId: string, followers: Follower[]): Promise<Follower[]>{
+
+    const promises: Promise<undefined>[] = [];
+    const result: Follower[] = [];
+
+    followers.forEach(f => {
+        promises.push(new Promise(resolve => {
+            return isPrivate(f.follows)
+            .then(res => {
+                if (!res)
+                    return false;
+        
+                return isAcceptedFollower(requestingUserId, f.follows);
+            })
+            .then(cannotSee => {
+                if (!cannotSee){
+                    result.push(f);
+                }
+
+                return resolve(undefined);
+            });;
+        }))
+    });
+
+    return Promise.all(promises)
+    .then(() => result);
+}
+
 
 function getUserPreferredHashtags(userId: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -29,14 +88,17 @@ function getUserPreferredHashtags(userId: string): Promise<string[]> {
             });
     });
 }
+
 export class FeedController {
     getFeed(req: Request, res: Response, next: NextFunction) {
 
         const userId = req.session.user?.id!;
 
-        const usersPromise: Promise<User[]> = getAllUsers();
-        const followersPromise: Promise<Follower[]> = getAllFollowing(userId);
+
+        const usersPromise: Promise<User[]> = getAllUsers().then(users => filterPrivateUsers(userId, users));
+        const followersPromise: Promise<Follower[]> = getAllFollowing(userId).then(followers => filterPrivateFollowing(userId, followers));;
         const userHashtagsPromise = getUserPreferredHashtags(userId);
+
 
         Promise.all([usersPromise, followersPromise, userHashtagsPromise])
             .then(([users, followers, userPreferredHashtags] : [User[], Follower[], string[]]) => {

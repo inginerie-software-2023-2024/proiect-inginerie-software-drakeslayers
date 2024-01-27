@@ -3,6 +3,36 @@ import { chatService } from "../services/chat-service";
 import { Chat } from "../utils/chat";
 import { v4 as uuidv4 } from 'uuid';
 import { craftError, errorCodes } from "../utils/error";
+import { isPrivate } from './ProfileController';
+import { isAcceptedFollower } from './FollowersController';
+
+function filterPrivateMembers(requestingUserId: string, members: string[]): Promise<string[]>{
+
+    const promises: Promise<undefined>[] = [];
+    const result: string[] = [];
+
+    members.forEach(m => {
+        promises.push(new Promise(resolve => {
+            return isPrivate(m)
+            .then(res => {
+                if (!res)
+                    return false;
+        
+                return isAcceptedFollower(requestingUserId, m);
+            })
+            .then(cannotSee => {
+                if (!cannotSee){
+                    result.push(m);
+                }
+
+                return resolve(undefined);
+            });;
+        }))
+    });
+
+    return Promise.all(promises)
+    .then(() => result);
+}
 
 const defaultPictureUrl = "defaultImage.png";
 
@@ -28,9 +58,26 @@ export class ChatController {
         };
 
         const members: String[] = [req.session.user!.id];
+
         if (req.body.members){
-            members.push(...req.body.members);
+            return filterPrivateMembers(req.session.user!.id, req.body.members)
+            .then(filteredMembers => {
+                if (filteredMembers.length !== req.body.members.length){
+                    const error = craftError(errorCodes.privateProfile, "Some members have private profiles!");
+                    return res.status(403).json({ error, content: undefined });
+                }
+
+                members.push(...filteredMembers);
+                return chatService.createChat(chat, members)
+                .then(() => res.status(200).json({ error: undefined, content: chat }));
+            })
+            .catch(err => {
+                console.error(err.message);
+                const error = craftError(errorCodes.other, "Please try creating chat again!");
+                return res.status(500).json({ error, content: undefined });
+            });
         }
+
 
         return chatService.createChat(chat, members)
         .then(() => res.status(200).json({ error: undefined, content: chat }))

@@ -4,6 +4,8 @@ import { File, Post, craftPictureDest, deleteFiles, knexInstance, moveFiles, zip
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
+import { isPrivate } from './ProfileController';
+import { isAcceptedFollower } from './FollowersController';
 
 
 export function getPostsByUser(userId: string) : Promise<Post[]> {
@@ -187,8 +189,26 @@ export class PostController {
 
     // metadata for all posts made by user
     getPostsByUser(req: Request, res: Response, next: NextFunction) {
+
         const userId = req.query['userid'] as string; 
-        getPostsByUser(userId!)
+        isPrivate(userId)
+        .then(res => {
+            if (!res)
+                return false;
+
+            const requestingUser = req.session?.user?.id;
+            if (!requestingUser)
+                return true;
+
+            return isAcceptedFollower(requestingUser, userId);
+        })
+        .then(cannotSee => {
+            if (cannotSee){
+                const error = craftError(errorCodes.privateProfile, "This profile is private!");
+                return res.status(403).json({ error, content: undefined });
+            }
+
+            getPostsByUser(userId!)
             .then(arr => {
                 if (arr.length === 0) {
                     const error = craftError(errorCodes.notFound, "No post found for this user!");
@@ -197,12 +217,13 @@ export class PostController {
 
                 return res.status(200).json({ error: undefined, content: arr });
 
-            })
-            .catch(err => {
-                console.error(err.message);
-                const error = craftError(errorCodes.other, "Please try again!");
-                return res.status(500).json({ error, content: undefined });
             });
+        })
+        .catch(err => {
+            console.error(err.message);
+            const error = craftError(errorCodes.other, "Please try again!");
+            return res.status(500).json({ error, content: undefined });
+        });
     }
 
     // sends urls to post media
