@@ -40,7 +40,7 @@ jobs:
         uses: actions/download-artifact@main
         with:
           name: dist
-          path: ./frontend/dist
+          path: dist
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
