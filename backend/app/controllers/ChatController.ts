@@ -34,6 +34,8 @@ function filterPrivateMembers(requestingUserId: string, members: string[]): Prom
     .then(() => result);
 }
 
+const defaultPictureUrl = "defaultImage.png";
+
 export class ChatController {
     createChat(req: Request, res: Response, next: NextFunction) {
 
@@ -42,10 +44,17 @@ export class ChatController {
             return res.status(403).json({ error, content: undefined });
         }
 
+        if (req.body.members.length > 1 && req.body.isGroup === false){
+            const error = craftError(errorCodes.noContent, "Cannot have 1-1 chat with more than 2 users!");
+            return res.status(400).json({ error, content: undefined });
+        }
+
         const chat: Chat = {
             id: uuidv4(),
             name: req.body.name,
             createdAt: new Date(),
+            isGroup: req.body.isGroup,
+            pictureUrl: req.file === undefined ? defaultPictureUrl : req.file.filename,
         };
 
         const members: String[] = [req.session.user!.id];
@@ -104,5 +113,32 @@ export class ChatController {
                     const error = craftError(errorCodes.other, "Please try reading messages again!");
                     return res.status(500).json({ error, content: undefined });
                 });
+    }
+
+    getSingleChat(req: Request, res: Response, next: NextFunction) {
+        return chatService.getSingleChat(req.session.user!.id, req.params.id)
+                .then(chat => res.status(200).json({ error: undefined, content: chat }))
+                .catch(err => {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try getting chat again!");
+                    return res.status(500).json({ error, content: undefined });
+                });
+    }
+
+    getChatsByUserId(req: Request, res: Response, next: NextFunction) {
+        const userId: string | undefined = req.query?.userId as string;
+
+        if (!userId){
+            const error = craftError(errorCodes.noContent, "Invalid user id!");
+            return res.status(400).json({ error, content: undefined });
+        }
+
+        return chatService.getChatsByUserId(userId)
+            .then(chats => res.status(200).json({ error: undefined, content: chats }))
+            .catch(err => {
+                console.error(err.message);
+                const error = craftError(errorCodes.other, "Please try getting chats again!");
+                return res.status(500).json({ error, content: undefined });
+            });
     }
 }

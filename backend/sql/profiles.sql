@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS public."Profiles"
     "profilePictureURL" text COLLATE pg_catalog."default" NOT NULL,
     bio text COLLATE pg_catalog."default",
     "isPrivate" boolean NOT NULL DEFAULT false,
+    "hashtags" text[] COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT "Profiles_pkey" PRIMARY KEY (id),
     CONSTRAINT "profiles_userId_fkey" FOREIGN KEY ("userId")
         REFERENCES public."Users" (id) MATCH SIMPLE

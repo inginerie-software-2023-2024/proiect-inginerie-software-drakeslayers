@@ -122,6 +122,20 @@ export class ProfileController {
             })
     }
 
+    searchProfiles(req: Request, res: Response, next: NextFunction){
+        const name: string = req.query.name as string;
+        return knexInstance('Profiles')
+            .select('*')
+            .where('username', 'like', `%${name}%`)
+            .orWhere('name', 'like', `%${name}%`)
+            .then((profiles: Profile[]) => res.status(200).json({ error: undefined, content: profiles }))
+            .catch(err => {
+                console.error(err.message);
+                const error = craftError(errorCodes.other, "Please try again!");
+                return res.status(500).json({ error, content: undefined });
+            });
+    }
+
     getProfilePicture(req: Request, res: Response, next: NextFunction) {
         knexInstance
             .select('*')
@@ -155,6 +169,7 @@ export class ProfileController {
             profilePictureURL: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
             bio: req.body.bio,
             isPrivate: req.body.isPrivate ? true  : false,
+            hashtags: req.body.hashtags,
         }
 
         knexInstance('Profiles')

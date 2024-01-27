@@ -24,9 +24,9 @@ const knexConfig: Knex.Config = {
     connection: {
         host: '127.0.0.1',
         port: 5432,
-        user: 'brontosaur',
-        password: '1234',
-        database: 'dbMDS'
+        user: 'admin',
+        password: 'password',
+        database: 'dbmds'
     },
 };
 
@@ -50,6 +50,7 @@ export interface Profile {
     profilePictureURL: string,
     bio?: string,
     isPrivate: boolean,
+    hashtags?: string[],
 }
 
 // user information to be used on client
@@ -80,6 +81,7 @@ export interface Post {
     userId: string,
     description?: string,
     picturesURLs: string[],
+    hashtags: string[],
 }
 
 export interface PostLike {
@@ -167,6 +169,33 @@ const multerProfiles = multer.diskStorage({
 // middleware for uploading profiles
 export const uploadProfiles: Multer = multer({ storage: multerProfiles });
 
+const multerChats = multer.diskStorage({
+    destination: (req: Request, file, cb) => {
+        // resources/chats/{pictureID}.extension
+        let dir = craftChatPicturesDest();
+        console.log(dir);
+        fs.mkdir(dir, { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+            cb(
+                null,
+                dir
+                );
+        });
+    },
+
+    filename: (req: Request, file, cb) => {
+        cb(
+            null,
+            uuidv4() + path.extname(file.originalname)
+        );
+    }
+});
+
+// middleware for uploading profiles
+export const uploadChats: Multer = multer({ storage: multerChats });
+
 export function deleteFiles(files: string[], callback: Function) {
     var i = files.length;
     files.forEach(function (filepath) {
@@ -188,6 +217,10 @@ export function craftPictureDest(userId: string): string {
 
 export function craftProfilePictureDest(userId: string): string {
     return path.join("resources/users/", userId, "profile/");
+}
+
+export function craftChatPicturesDest(): string {
+    return path.join("resources/chats/");
 }
 
 export function craftProfilePictureURL(userId: string, pictureName: string): string {
@@ -250,6 +283,28 @@ export function uploadMediaPosts(req: Request, res: Response, next: NextFunction
 
 export function uploadMediaProfiles(req: Request, res: Response, next: NextFunction) {
     const upload = uploadProfiles.single('media');
+
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            if (err.message === 'Unexpected field') {
+                const error = craftError(errorCodes.failedToUpload, "Too many files!");
+                return res.status(400).json({ error, content: undefined });
+            }
+            // A Multer error occurred when uploading.
+            const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
+            return res.status(500).json({ error, content: undefined });
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
+            return res.status(500).json({ error, content: undefined });
+        }
+        // Everything went fine. 
+        return next();
+    })
+}
+
+export function uploadMediaChatPicture(req: Request, res: Response, next: NextFunction) {
+    const upload = uploadChats.single('media');
 
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
