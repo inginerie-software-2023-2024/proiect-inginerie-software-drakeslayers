@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: static-site
-          path: ./frontend/dist
+          path: ./frontend/dist/proiect-mdsangular
 
   deploy-frontend:
     name: Deploy frontend
@@ -52,7 +52,7 @@ jobs:
 
 
           # will put all file under this path
-          local_path: dist/proiect-mdsangular/*
+          local_path: /*
           # files will copy to under remote_path
           remote_path: /var/www/html
 
