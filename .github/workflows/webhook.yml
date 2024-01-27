@@ -63,7 +63,7 @@ jobs:
   deploy-backend:
     name: Deploy backend
     runs-on: ubuntu-latest
-#    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './backend') || contains(github.event.commits.*.modified, './backend') }}
+    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './backend') || contains(github.event.commits.*.modified, './backend') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
