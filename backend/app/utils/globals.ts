@@ -269,6 +269,28 @@ export function uploadMediaProfiles(req: Request, res: Response, next: NextFunct
     })
 }
 
+export function uploadMediaChatPicture(req: Request, res: Response, next: NextFunction) {
+    const upload = uploadProfiles.single('media');
+
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            if (err.message === 'Unexpected field') {
+                const error = craftError(errorCodes.failedToUpload, "Too many files!");
+                return res.status(400).json({ error, content: undefined });
+            }
+            // A Multer error occurred when uploading.
+            const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
+            return res.status(500).json({ error, content: undefined });
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
+            return res.status(500).json({ error, content: undefined });
+        }
+        // Everything went fine. 
+        return next();
+    })
+}
+
 // middleware to verify if a profile exists
 export function ProfileExists(req: Request, res: Response, next: NextFunction) {
     console.log("sunt in profile exists");
