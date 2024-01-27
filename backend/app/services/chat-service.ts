@@ -1,7 +1,19 @@
 import { SocketsService } from './sockets-service';
-import { Chat, ChatMessage } from '../utils/chat';
-import { knexInstance } from '../utils/globals';
+import { Chat, ChatMessage, ChatUser } from '../utils/chat';
+import { Profile, knexInstance } from '../utils/globals';
 import { craftError, errorCodes } from '../utils/error';
+import { getProfileByUserId } from '../controllers/ProfileController';
+
+function getChatMembers(chatId: string): Promise<string[]> {
+    return knexInstance('ChatUsers')
+            .select('userId')
+            .where({ chatId })
+            .then((arr: ChatUser[]) => {
+                if (arr)
+                    return arr.map(x => x.userId as string);
+                return [];
+            })
+}
 
 class ChatService {
     private readonly socketsService: SocketsService;
@@ -89,6 +101,65 @@ class ChatService {
                     })
                     // map members of chat to room
                     .then(() => trx('ChatUsers').insert(members.map(x => ({chatId: chat.id, userId: x, lastRead: new Date()})))));
+    }
+
+    public getSingleChat(requesterId:string, chatId: string): Promise<Chat | undefined> {
+        return knexInstance('Chats')
+            .select('*')
+            .where({ chatId })
+            .first()
+            .then((chat: Chat) => {
+                if (!chat)
+                    return chat; 
+
+                if (!chat.isGroup){
+                    return getChatMembers(chatId)
+                    .then(members => {
+                        for (let i = 0; i < members.length; ++i)
+                            if (members[i] !== requesterId){
+                                return getProfileByUserId(members[i])
+                                .then((profile: Profile | undefined) => {
+                                    chat.pictureUrl = profile?.profilePictureURL;
+
+                                    return chat;
+                                })
+                            }
+                    })
+                }
+            });
+    }
+
+    public getChatsByUserId(userId: string): Promise<Chat[]>{
+        return knexInstance
+            .select('Chats.*')
+            .from('Chats')
+            .join('ChatUsers', 'Chats.chatId', '=', 'ChatUsers.chatId')
+            .where('ChatUsers.userId', userId)
+            .then((chats: Chat[]) => {
+                const promises: Promise<Chat>[] = [];
+                chats.forEach((c: Chat) => {
+                    if (!c.isGroup){
+                        const chatPromise: Promise<Chat> = 
+                        getChatMembers(c.id!)
+                        .then(members => {
+                            for (let i = 0; i < members.length; ++i)
+                                if (members[i] !== userId){
+                                    return getProfileByUserId(members[i])
+                                    .then((profile: Profile | undefined) => {
+                                        c.pictureUrl = profile?.profilePictureURL;
+                                        return c;
+                                    })
+                                }
+                        }) as Promise<Chat>;
+
+                        promises.push(chatPromise);
+                    }else{
+                        promises.push(Promise.resolve(c));
+                    }
+                })
+
+                return Promise.all(promises);
+            });
     }
 }
 
