@@ -1,0 +1,29 @@
+@use "mixins" as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+.spacer {
+  @include spacer;
+}
+
+.faded-p {
+  @include faded-p;
+}
+
+.search-users-form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.start-typing, .no-users {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

@@ -1,0 +1,26 @@
+<form class="search-users-form" [formGroup]="searchUsersForm">
+  <mat-form-field class="search-users-form-field">
+    <input matInput placeholder="Search for users" formControlName="username" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+</form>
+
+<ng-container *ngIf="username.length >= 3; else startTyping">
+  <ng-container *ngIf="1 < 0; else noUsers"></ng-container>
+</ng-container>
+
+<ng-template #startTyping>
+  <div class="start-typing">
+    <div class="spacer"></div>
+    <p class="faded-p">Start typing at least 3 letters.</p>
+    <div class="spacer"></div>
+  </div>
+</ng-template>
+
+<ng-template #noUsers>
+  <div class="no-users">
+    <div class="spacer"></div>
+    <p class="faded-p">No users found.</p>
+    <div class="spacer"></div>
+  </div>
+</ng-template>
