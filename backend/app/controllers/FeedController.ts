@@ -1,13 +1,92 @@
 import express, { Express, Request, Response, RequestHandler, NextFunction } from 'express';
-import { getAllFollowing } from './FollowersController';
+import { getAllFollowing, isAcceptedFollower } from './FollowersController';
 import { Follower, Post, User, knexInstance } from '../utils/globals';
 import { getPostsByUser } from './PostController';
 import { craftError, errorCodes } from '../utils/error';
 import path from 'path';
+import { isPrivate } from './ProfileController';
 
 function getAllUsers() {
     return knexInstance('Users')
         .select("*");
+}
+
+
+function filterPrivateUsers(requestingUserId: string, users: User[]): Promise<User[]>{
+
+    const promises: Promise<undefined>[] = [];
+    const result: User[] = [];
+
+    users.forEach(u => {
+        promises.push(new Promise(resolve => {
+            return isPrivate(u.id)
+            .then(res => {
+                if (!res)
+                    return false;
+        
+                return isAcceptedFollower(requestingUserId, u.id);
+            })
+            .then(cannotSee => {
+                if (!cannotSee){
+                    result.push(u);
+                }
+
+                return resolve(undefined);
+            });;
+        }))
+    });
+
+    return Promise.all(promises)
+    .then(() => result);
+}
+
+function filterPrivateFollowing(requestingUserId: string, followers: Follower[]): Promise<Follower[]>{
+
+    const promises: Promise<undefined>[] = [];
+    const result: Follower[] = [];
+
+    followers.forEach(f => {
+        promises.push(new Promise(resolve => {
+            return isPrivate(f.follows)
+            .then(res => {
+                if (!res)
+                    return false;
+        
+                return isAcceptedFollower(requestingUserId, f.follows);
+            })
+            .then(cannotSee => {
+                if (!cannotSee){
+                    result.push(f);
+                }
+
+                return resolve(undefined);
+            });;
+        }))
+    });
+
+    return Promise.all(promises)
+    .then(() => result);
+}
+
+
+function getUserPreferredHashtags(userId: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+        knexInstance.select('hashtags')
+            .from('Profiles')
+            .where('userId', userId)
+            .first()
+            .then(profile => {
+                if (profile && profile.hashtags) {
+                    resolve(profile.hashtags);
+                } else {
+                    resolve([]); // No hashtags found, return an empty array
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching preferred hashtags:", error);
+                reject(error);
+            });
+    });
 }
 
 export class FeedController {
@@ -15,11 +94,14 @@ export class FeedController {
 
         const userId = req.session.user?.id!;
 
-        const usersPromise: Promise<User[]> = getAllUsers();
-        const followersPromise: Promise<Follower[]> = getAllFollowing(userId);
 
-        Promise.all([usersPromise, followersPromise])
-            .then(([users, followers]: [User[], Follower[]]) => {
+        const usersPromise: Promise<User[]> = getAllUsers().then(users => filterPrivateUsers(userId, users));
+        const followersPromise: Promise<Follower[]> = getAllFollowing(userId).then(followers => filterPrivateFollowing(userId, followers));;
+        const userHashtagsPromise = getUserPreferredHashtags(userId);
+
+
+        Promise.all([usersPromise, followersPromise, userHashtagsPromise])
+            .then(([users, followers, userPreferredHashtags] : [User[], Follower[], string[]]) => {
 
                 // this is used to set a higher priority 
                 // to posts made by user or those he follows
@@ -48,17 +130,17 @@ export class FeedController {
                             }
                         });
 
+                        const userPreferredHashtagsSet: Set<string> = new Set(userPreferredHashtags);
                         return posts.sort((a, b) => {
-                            const res1: boolean = followingIDSet.has(a.userId);
-                            const res2: boolean = followingIDSet.has(b.userId);
+                            const aIntersectionSize = a.hashtags.filter(tag => userPreferredHashtagsSet.has(tag)).length;
+                            const bIntersectionSize = b.hashtags.filter(tag => userPreferredHashtagsSet.has(tag)).length;
 
-                            // prioritize following and user posts 
-                            if (res1 && !res2)
-                                return -1;
-                            if (!res1 && res2)
-                                return 1;
+                            // Prioritize by number of matching hashtags
+                            if (aIntersectionSize > bIntersectionSize) return -1;
+                            if (aIntersectionSize < bIntersectionSize) return 1;
 
-                            return a.createdAt.valueOf() - b.createdAt.valueOf()
+                            // If equal, sort by creation date
+                            return b.createdAt.valueOf() - a.createdAt.valueOf();
                         });
                     })
                     .then((posts: Post[]) => {

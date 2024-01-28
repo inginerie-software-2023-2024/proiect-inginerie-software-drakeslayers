@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS public."Posts"
     "userId" text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default",
     "picturesURLs" text[] COLLATE pg_catalog."default" NOT NULL,
+    "hashtags" text[] COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT "Posts_pkey" PRIMARY KEY (id),
     CONSTRAINT "posts_userId_fkey" FOREIGN KEY ("userId")
         REFERENCES public."Users" (id) MATCH SIMPLE

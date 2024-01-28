@@ -30,6 +30,14 @@ function getAllFollowers(userId: string) {
         .where('follows', userId);
 }
 
+export function isAcceptedFollower(userId: string, followedId: string){
+    return knexInstance('Followers')
+        .select('accepted')
+        .where({ follows: followedId, followedBy: userId})
+        .first()
+        .then(x => x ? x.accepted : false);
+}
+
 export class FollowersController {
     request(req: Request<{}, {}, Partial<Follower>>, res: Response, next: NextFunction) {
         userExists(req.body.follows!)

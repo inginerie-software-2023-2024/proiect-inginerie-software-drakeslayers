@@ -49,6 +49,8 @@ export interface Profile {
     name: string,
     profilePictureURL: string,
     bio?: string,
+    isPrivate: boolean,
+    hashtags?: string[],
 }
 
 // user information to be used on client
@@ -79,6 +81,7 @@ export interface Post {
     userId: string,
     description?: string,
     picturesURLs: string[],
+    hashtags: string[],
 }
 
 export interface PostLike {
