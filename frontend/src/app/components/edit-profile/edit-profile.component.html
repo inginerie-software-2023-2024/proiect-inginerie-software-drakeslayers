@@ -29,6 +29,18 @@
         <mat-error *ngIf="bio && bio.invalid">{{ bio | formControlErrorMessage : bio.errors }}</mat-error>
       </mat-form-field>
     </div>
+    <div>
+      <mat-form-field class="edit-profile-form-field">
+        <mat-label>Profile Privacy</mat-label>
+        <mat-select formControlName="isPrivate">
+          <mat-option value="false">Public</mat-option>
+          <mat-option value="true">Private</mat-option>
+        </mat-select>
+        <mat-error *ngIf="isPrivate && isPrivate.invalid">
+          {{ isPrivate | formControlErrorMessage : isPrivate.errors }}
+        </mat-error>
+      </mat-form-field>
+    </div>
     <div class="edit-profile-form-field">
       <button mat-raised-button class="choose-photo-btn btn" color="accent" type="button" (click)="fileInput.click()">
         Choose a profile photo

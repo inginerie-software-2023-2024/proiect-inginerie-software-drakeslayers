@@ -55,6 +55,21 @@
           <button mat-raised-button matStepperNext type="button">Next</button>
         </div>
       </mat-step>
+      <mat-step label="Set profile privacy" [stepControl]="isPrivate">
+        <mat-form-field class="create-profile-form-field">
+          <mat-label>Profile Privacy</mat-label>
+          <mat-select formControlName="isPrivate">
+            <mat-option value="false">Public</mat-option>
+            <mat-option value="true">Private</mat-option>
+          </mat-select>
+          <mat-error *ngIf="isPrivate.invalid">{{ isPrivate | formControlErrorMessage : isPrivate.errors }}</mat-error>
+        </mat-form-field>
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-raised-button matStepperNext type="button">Next</button>
+        </div>
+      </mat-step>
+
 
       <mat-step label="Done">
         <ng-template matStepLabel>Done</ng-template>

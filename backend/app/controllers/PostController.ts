@@ -58,7 +58,8 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
 }
 
 async function getHashtags(description: string): Promise<string[]> {
-    let link_to_server: string = "http://localhost:5000"; // TODO: change this to the server's link
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Ignore SSL errors (not recommended for production)
+    let link_to_server: string = "https://localhost:8080"; // TODO: change this to the server's link
     let route: string = link_to_server + "/extract_hashtags";
     const response = await fetch(route, {
         method: 'POST',

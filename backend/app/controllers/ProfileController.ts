@@ -168,9 +168,10 @@ export class ProfileController {
             name: req.body.name,
             profilePictureURL: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
             bio: req.body.bio,
-            isPrivate: req.body.isPrivate ? true  : false,
-            hashtags: req.body.hashtags,
+            isPrivate: req.body.isPrivate,
+            hashtags: [],
         }
+        console.log(profile.isPrivate);
 
         knexInstance('Profiles')
             .insert(profile)
@@ -206,6 +207,8 @@ export class ProfileController {
                 if (req.body.isPrivate !== undefined){
                     updatedProfile.isPrivate = req.body.isPrivate;
                 }
+
+                console.log(updatedProfile.isPrivate);
 
                 if (req.file) {
                     // Delete the old profile picture
