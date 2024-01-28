@@ -124,7 +124,7 @@ jobs:
             cd /root/BackEndPython
             pip install -r requirements.txt
 #            python3 run.py
-            (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done Python!"
+            (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
             cd /root/BackEnd
             ./shutdown.sh
             npm install
