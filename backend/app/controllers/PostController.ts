@@ -278,7 +278,8 @@ export class PostController {
                     .andWhere('userId', req.session.user!.id);
 
                 if (post.description) {
-                    const hashtags = await getHashtags(post.description);
+                    // const hashtags = await getHashtags(post.description);
+                    const hashtags = [[]]
                     query.update({ description: post.description, hashtags: hashtags }, "*");
                 }
 
