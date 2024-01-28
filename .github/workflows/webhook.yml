@@ -121,6 +121,7 @@ jobs:
           script: |
             cd /root/BackEndPython
             python3 run.py
+            pip install -r requirements.txt
             cd /root/BackEnd
             ./shutdown.sh
             npm install
