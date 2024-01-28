@@ -84,7 +84,7 @@ class ChatService {
         });
     }
 
-    public createChat(chat: Chat, members: String[]): Promise<any>{
+    public createChat(chat: Chat, members: String[], requesterId: string): Promise<Chat | undefined>{
         return knexInstance
                .transaction(trx => 
 
@@ -100,7 +100,25 @@ class ChatService {
                         }
                     })
                     // map members of chat to room
-                    .then(() => trx('ChatUsers').insert(members.map(x => ({chatId: chat.id, userId: x, lastRead: new Date()})))));
+                    .then(() => trx('ChatUsers').insert(members.map(x => ({chatId: chat.id, userId: x, lastRead: new Date()})))))
+                    .then(() => {
+                        if (!chat.isGroup){
+                            return getChatMembers(chat.id!)
+                            .then(members => {
+                                for (let i = 0; i < members.length; ++i)
+                                    if (members[i] !== requesterId){
+                                        return getProfileByUserId(members[i])
+                                        .then((profile: Profile | undefined) => {
+                                            chat.pictureUrl = profile?.profilePictureURL;
+                                            chat.name = profile?.name === undefined ? profile?.username : profile.name;
+                                            return chat;
+                                        })
+                                    }
+                            })
+                        }
+
+                        return chat;
+                    })
     }
 
     public getSingleChat(requesterId:string, chatId: string): Promise<Chat | undefined> {
@@ -120,7 +138,7 @@ class ChatService {
                                 return getProfileByUserId(members[i])
                                 .then((profile: Profile | undefined) => {
                                     chat.pictureUrl = profile?.profilePictureURL;
-
+                                    chat.name = profile?.name === undefined ? profile?.username : profile.name;
                                     return chat;
                                 })
                             }
@@ -147,6 +165,7 @@ class ChatService {
                                     return getProfileByUserId(members[i])
                                     .then((profile: Profile | undefined) => {
                                         c.pictureUrl = profile?.profilePictureURL;
+                                        c.name = profile?.name === undefined ? profile?.username : profile.name;
                                         return c;
                                     })
                                 }

@@ -30,8 +30,8 @@ export class ChatController {
             memberIds.push(...req.body.memberIds);
         }
 
-        return chatService.createChat(chat, memberIds)
-        .then(() => res.status(200).json({ error: undefined, content: chat }))
+        return chatService.createChat(chat, memberIds, req.session.user!.id)
+        .then((chat: Chat | undefined) => res.status(200).json({ error: undefined, content: chat }))
         .catch(err => {
             console.error(err.message);
             const error = craftError(errorCodes.other, "Please try creating chat again!");
