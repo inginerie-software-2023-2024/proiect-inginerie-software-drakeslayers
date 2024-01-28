@@ -108,7 +108,7 @@ jobs:
   run:
     name: Run backend
     runs-on: ubuntu-latest
-    needs: deploy-backend, deploy-backend-python
+    needs: [deploy-backend, deploy-backend-python]
     steps:
       - name: Run
         uses: appleboy/ssh-action@v0.1.10
