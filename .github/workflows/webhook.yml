@@ -119,6 +119,8 @@ jobs:
           command_timeout: 60s
           port: 22
           script: |
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            export OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }}
             cd /root/BackEndPython
             python3 run.py
             cd /root/BackEnd
