@@ -122,8 +122,9 @@ jobs:
             export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             export OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }}
             cd /root/BackEndPython
-            python3 run.py
             pip install -r requirements.txt
+#            python3 run.py
+            (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done Python!"
             cd /root/BackEnd
             ./shutdown.sh
             npm install
