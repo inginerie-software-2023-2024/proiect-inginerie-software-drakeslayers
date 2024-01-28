@@ -9,8 +9,6 @@ on:
       - ./backend-python
   pull_request:
     branches: [ production ]
-  merge:
-    branches: [ production ]
   workflow_dispatch:
 
 
