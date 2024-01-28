@@ -58,7 +58,7 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
 }
 
 async function getHashtags(description: string): Promise<string[]> {
-    let link_to_server: string = "http://promeret.social:5000"; // TODO: change this to the server's link
+    let link_to_server: string = "localhost:8080"; // TODO: change this to the server's link
     let route: string = link_to_server + "/extract_hashtags";
     try {
         const response = await fetch(route, {
