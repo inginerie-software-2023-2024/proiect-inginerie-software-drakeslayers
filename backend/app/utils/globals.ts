@@ -24,9 +24,9 @@ const knexConfig: Knex.Config = {
     connection: {
         host: '127.0.0.1',
         port: 5432,
-        user: 'admin',
-        password: 'password',
-        database: 'dbmds'
+        user: 'brontosaurus',
+        password: '1234',
+        database: 'dbMds'
     },
 };
 
