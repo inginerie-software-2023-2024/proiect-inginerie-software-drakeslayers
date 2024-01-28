@@ -37,8 +37,10 @@ import { NotificationComponent } from './components/notifications/notification/n
 import { PostComponent } from './components/shared/post/post.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
+  console.log('\n\n\n\n\n\nIn init app factory\n\n\n\n\n\n');
   return () => {
     return new Observable((observer) => {
+      console.log('\n\n\n\n\n\nIn OBJ\n\n\n\n\n\n');
       notificationsService.setupSocket();
       observer.next();
       observer.complete();

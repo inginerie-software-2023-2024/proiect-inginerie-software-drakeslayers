@@ -75,6 +75,7 @@ export class NotificationsService {
   }
 
   public setupSocket(): void {
+    console.log('\n\n\n\n\n\nTESTING CSTR SETUP SOCKET\n\n\n\n\n\n');
     this.startListening();
 
     this.userService.currentUser$.subscribe((user) => {
