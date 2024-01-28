@@ -38,7 +38,10 @@ export class NotificationsService {
   }
 
   private startListening(): void {
+    console.log('\n\n\n\n\nCONNECTION REALISED\n\n\n\n\n');
     this.socket.connect();
+
+    console.log(this.socket.connected);
 
     this.socket.on('followRequestNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
