@@ -60,19 +60,25 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
 async function getHashtags(description: string): Promise<string[]> {
     let link_to_server: string = "http://promeret.social:5000"; // TODO: change this to the server's link
     let route: string = link_to_server + "/extract_hashtags";
-    const response = await fetch(route, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ description: description }),
-    });
+    try {
+        const response = await fetch(route, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({description: description}),
+        });
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data['hashtags'];
     }
-    const data = await response.json();
-    return data['hashtags'];
+    catch (e) {
+        console.log(e);
+    }
+    return [''];
 }
 
 export class PostController {
