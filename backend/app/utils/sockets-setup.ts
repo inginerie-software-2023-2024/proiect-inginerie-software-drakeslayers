@@ -10,7 +10,7 @@ const chatOnDisconnect = (userId: string) => chatService.getSocketsService().rem
 export const setupSockets = (httpsServer: https.Server): void => {
     const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpsServer, {
         cors: {
-            origin: 'https://promeret.social',
+            origin: '*',
             // allowedHeaders: ['notification'],
             credentials: true
         }
