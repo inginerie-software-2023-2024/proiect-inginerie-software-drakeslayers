@@ -17,6 +17,7 @@ export const setupSockets = (httpsServer: https.Server): void => {
     });
 
     io.on('connection', (socket) => {
+        console.log('\n\n\n\n\nConnection realised!\n\n\n\n\n');
         const socketType: string = socket.handshake.auth.socketType;
         const userId: string  = socket.handshake.auth.userId;
 

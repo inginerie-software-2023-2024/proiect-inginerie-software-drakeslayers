@@ -21,7 +21,7 @@ export class NotificationsService {
   }
 
   private createConnection(userId: string | undefined = undefined): ClientSocket {
-    return io('https://promeret.social', { autoConnect: false, auth: { userId } });
+    return io('https://promeret.social:443', { autoConnect: false, auth: { userId } });
   }
 
   public onSocketButton(): void {
