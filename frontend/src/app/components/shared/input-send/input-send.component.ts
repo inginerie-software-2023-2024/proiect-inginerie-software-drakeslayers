@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, HostBinding } from '@angular/core';
+import { Component, EventEmitter, Input, Output, HostListener } from '@angular/core';
 
 @Component({
   selector: 'mds-input-send',
@@ -22,6 +22,7 @@ export class InputSendComponent {
 
   constructor() {}
 
+  @HostListener('document:keydown.enter')
   public onSendClick() {
     this.send.emit();
   }

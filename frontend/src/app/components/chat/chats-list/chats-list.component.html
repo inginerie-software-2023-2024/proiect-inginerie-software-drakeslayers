@@ -8,7 +8,7 @@
 </div>
 
 <div class="chats-list-container" (click)="clearSelection()">
-  <ng-container *ngIf="myChats.length > 0; else noChats">
+  <ng-container *ngIf="chatsWithMessages.length > 0; else noChats">
     <div
       *ngFor="let obj of chatsWithMessages"
       class="chat-container"
@@ -23,7 +23,9 @@
             {{ (obj.messages.length > 0 ? obj.messages.slice(-1)[0].sentAt : obj.lastRead) | timestampToHour }}
           </p>
         </div>
-        <p class="chat-last-message">{{ obj.messages.length > 0 ? obj.messages[0] : "This chat is empty." }}</p>
+        <p class="chat-last-message">
+          {{ obj.messages.length > 0 ? obj.messages.slice(-1)[0].text : "This chat is empty." }}
+        </p>
       </div>
     </div>
   </ng-container>

@@ -8,6 +8,7 @@ import { ChatWithMessages } from 'app/models/chat/chat-with-messages.model';
 import _ from 'lodash';
 import { ChatService } from 'app/core/services/chat.service';
 import { SubscriptionCleanup } from 'app/shared/utils/subscription-cleanup';
+import { ActiveChatService } from 'app/core/services/active-chat.service';
 
 @Component({
   selector: 'mds-chats-list',
@@ -15,54 +16,32 @@ import { SubscriptionCleanup } from 'app/shared/utils/subscription-cleanup';
   styleUrls: ['./chats-list.component.scss']
 })
 export class ChatsListComponent extends SubscriptionCleanup {
-  public myChats$ = this.myChatsService.getMyChatsAsync().pipe(
-    tap((chats) => {
-      this.previousChats = this.myChats;
-      this.myChats = chats;
-    })
-  );
-  public myChats: Chat[] = [];
-  public previousChats: Chat[] = [];
-
-  public newChats$: Observable<Chat[]> = this.myChats$.pipe(
-    map((chats) => _.differenceBy(chats, this.previousChats, 'id'))
-  );
-  public chatsWithMessages$: Observable<ChatWithMessages[]> = this.newChats$.pipe(
-    concatMap((newChats) =>
-      forkJoin(
-        newChats.map((chat) =>
-          this.chatService.getMessages(chat.id).pipe(
-            // create new ChatWithMessages object
-            map(({ content: { lastRead, messages } }) => ({
-              chat,
-              lastRead,
-              messages
-            }))
-          )
-        )
-      )
-    ),
-    map((chatsWithMessages) =>
-      [...this.chatsWithMessages, ...chatsWithMessages].sort(
-        (a, b) =>
-          new Date(b.messages.slice(-1)[0]?.sentAt || b.lastRead).getTime() -
-          new Date(a.messages.slice(-1)[0]?.sentAt || a.lastRead).getTime()
-      )
-    ),
-    tap((chatsWithMessages) => (this.chatsWithMessages = chatsWithMessages))
-  );
+  public chatsWithMessages$ = this.myChatsService.myChats$;
   public chatsWithMessages: ChatWithMessages[] = [];
 
+  public firstLoad: boolean = true;
   public activeChatId: string | null = null;
 
   constructor(
     private readonly dialog: MatDialog,
-    private myChatsService: MyChatsService,
-    private readonly chatService: ChatService
+    private readonly myChatsService: MyChatsService,
+    private readonly chatService: ChatService,
+    private readonly activeChatService: ActiveChatService
   ) {
     super();
     this.myChatsService.reloadChats();
-    this.chatsWithMessages$.pipe(takeUntil(this.destroy$)).subscribe();
+    this.chatsWithMessages$
+      .pipe(
+        tap((chats) => (this.chatsWithMessages = chats)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((chats) => {
+        // If there is no active chat, select the first one
+        if (this.firstLoad && chats.length > 0) {
+          this.onChatClick(chats[0].chat.id);
+          this.firstLoad = false;
+        }
+      });
   }
 
   public openCreateChatDialog(): void {
@@ -73,10 +52,12 @@ export class ChatsListComponent extends SubscriptionCleanup {
     this.activeChatId = chatId;
     // Mark messages as read
     this.chatService.readMessages(chatId).subscribe();
+    this.activeChatService.selectChat(this.chatsWithMessages.find((chat) => chat.chat.id === chatId)!);
   }
 
   @HostListener('document:keydown.escape')
   public clearSelection(): void {
     this.activeChatId = null;
+    this.activeChatService.removeSelectedChat();
   }
 }

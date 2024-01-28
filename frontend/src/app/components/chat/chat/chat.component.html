@@ -1,4 +1,47 @@
-<ng-container *ngIf="1 < 0; else noChatOpened"></ng-container>
+<ng-container *ngIf="{ activeChat: activeChat$ | async, currentUser: currentUser$ | async } as data">
+  <ng-container *ngIf="data.activeChat; else noChatOpened">
+    <div class="chat-container">
+      <div class="header">
+        <img class="chat-picture" [src]="data.activeChat.chat.pictureUrl | apiPrefix" />
+        <p class="chat-name">{{ data.activeChat.chat.name }}</p>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="messages-container">
+        <ng-container
+          *ngFor="let message of data.activeChat.messages"
+          [ngTemplateOutlet]="data.activeChat.chat.isGroup ? groupMessage : oneToOneMessage"
+          [ngTemplateOutletContext]="{ message: message, currentUser: data.currentUser }"
+        ></ng-container>
+      </div>
+
+      <div class="footer">
+        <mds-input-send
+          [placeholder]="'Type a message...'"
+          [(content)]="message"
+          (send)="sendMessage(data.activeChat.chat.id)"
+        ></mds-input-send>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>
+
+<ng-template #oneToOneMessage let-message="message" , let-currentUser="currentUser">
+  <div class="one-to-one-message-container message-container" [class.from-me]="currentUser.id === message.authorId">
+    <div class="message-box">
+      <span class="message-text">{{ message.text }}</span>
+      <span class="message-date">{{ message.sentAt | timestampToHour }}</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #groupMessage let-message="message">
+  <div class="group-message-container message-container">
+    <mds-profile-pic></mds-profile-pic>
+    {{ message.text }}
+  </div>
+</ng-template>
 
 <ng-template #noChatOpened>
   <div class="spacer"></div>
