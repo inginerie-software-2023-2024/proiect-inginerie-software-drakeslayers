@@ -34,7 +34,7 @@ jobs:
   deploy-frontend:
     name: Deploy frontend
     runs-on: ubuntu-latest
-    if: {{ contains(github.event.commits.*.added, 'frontend') || contains(github.event.commits.*.modified, 'frontend') }}
+    if: (contains(github.event.commits.*.added, 'frontend') || contains(github.event.commits.*.modified, 'frontend'))
     needs: build-frontend
     steps:
       #      - name: Checkout repository
