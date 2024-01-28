@@ -57,23 +57,23 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
     return picturesURLs.map((url) => path.join('users/', userId, 'pictures/', url));
 }
 
-async function getHashtags(description: string): Promise<string[]> {
-    let link_to_server: string = "http://promeret.social"; // TODO: change this to the server's link
-    let route: string = link_to_server + "/extract_hashtags";
-    const response = await fetch(route, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ description: description }),
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data['hashtags'];
-}
+// async function getHashtags(description: string): Promise<string[]> {
+//     let link_to_server: string = "http://promeret.social"; // TODO: change this to the server's link
+//     let route: string = link_to_server + "/extract_hashtags";
+//     const response = await fetch(route, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ description: description }),
+//     });
+//
+//     if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//     }
+//     const data = await response.json();
+//     return data['hashtags'];
+// }
 
 export class PostController {
 
@@ -97,7 +97,9 @@ export class PostController {
         let userId = req.session.user!.id;
         let description = req.body.description;
 
-        const hashtags = await getHashtags(description);
+        // const hashtags = await getHashtags(description);
+
+        const hashtags = [[]]
 
         let post = {
             id,
