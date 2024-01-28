@@ -3,12 +3,8 @@ name: Build & Deploy
 on:
   push:
     branches: [ production ]
-#    paths:
-#      - backend
-#      - frontend
-#      - backend-python
-#  pull_request:
-#    branches: [ production ]
+  pull_request:
+    branches: [ production ]
   workflow_dispatch:
 
 

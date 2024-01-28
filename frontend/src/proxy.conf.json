@@ -1,6 +1,6 @@
 {
   "/api/": {
-    "target": "https://localhost:8080",
+    "target": "https://promeret.social",
     "secure": false,
     "pathRewrite": {
       "^/api/": "/"
