@@ -1,6 +1,7 @@
 @use "colors" as *;
 @use "mixins" as *;
 @use "variables" as *;
+@use "typography-levels" as typography-levels;
 
 :host {
   display: flex;
@@ -38,6 +39,63 @@
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
+  padding: 16px;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  &:not(.active):hover {
+    background-color: $gray-200;
+  }
+
+  &.active {
+    background-color: $gray-300;
+  }
+
+  .chat-picture {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .chat-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 8px;
+
+    p {
+      margin: 0;
+    }
+
+    .name-and-date {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      .chat-date {
+        @include typography-levels.small;
+        color: $gray-600;
+      }
+    }
+
+    .chat-last-message {
+      color: $gray-600;
+    }
+  }
 }
 
 .no-chats-container {

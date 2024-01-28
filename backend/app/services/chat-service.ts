@@ -57,7 +57,7 @@ class ChatService {
 
     }
 
-    public readMessages(userId: string, chatId: string): Promise<any>{
+    public getMessages(userId: string, chatId: string): Promise<any>{
         const lastRead = new Promise(resolve => {
             return knexInstance('ChatUsers')
                 .select('lastRead')
@@ -77,11 +77,11 @@ class ChatService {
 
         const messages = knexInstance('ChatMessages').where({chatId});
 
-        return Promise.all([lastRead, messages])
-        .then(( [lastRead, messages] ) => {
-            return knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId, chatId})
-            .then(() => ({ lastRead, messages}));
-        });
+        return Promise.all([lastRead, messages]).then(([lastRead, messages]) => ({ lastRead, messages }));
+    }
+
+    public readMessages(userId: string, chatId: string): Promise<any>{
+        return knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId, chatId});
     }
 
     public createChat(chat: Chat, members: String[], requesterId: string): Promise<Chat | undefined>{

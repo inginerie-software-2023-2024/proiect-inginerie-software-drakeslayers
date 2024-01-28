@@ -56,9 +56,19 @@ export class ChatController {
                 });
     }
 
+    getMessages(req: Request, res: Response, next: NextFunction) {
+        return chatService.getMessages(req.session.user!.id, req.params.chatId)
+               .then((chatMessages) => res.status(200).json({ error: undefined, content: chatMessages }))
+               .catch(err => {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try reading messages again!");
+                    return res.status(500).json({ error, content: undefined });
+                });
+    }
+
     readMessages(req: Request, res: Response, next: NextFunction) {
         return chatService.readMessages(req.session.user!.id, req.params.chatId)
-               .then((chatMessages) => res.status(200).json({ error: undefined, content: chatMessages }))
+               .then(() => res.status(200).json({ error: undefined, content: undefined }))
                .catch(err => {
                     console.error(err.message);
                     const error = craftError(errorCodes.other, "Please try reading messages again!");

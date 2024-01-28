@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS public."Chats"
 (
     id text COLLATE pg_catalog."default" NOT NULL,
-    name text COLLATE pg_catalog."default" NOT NULL,
+    name text COLLATE pg_catalog."default" NULL,
     "createdAt" timestamp without time zone NOT NULL,
     "isGroup" boolean NOT NULL,
     "pictureUrl" text COLLATE pg_catalog."default",
