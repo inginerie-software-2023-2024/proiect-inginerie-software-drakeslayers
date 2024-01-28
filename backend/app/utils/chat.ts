@@ -7,7 +7,7 @@ export interface ChatMessage {
 
 export interface Chat{
     id: string | undefined, 
-    name: string,
+    name: string | undefined,
     createdAt: Date, 
     isGroup: boolean,
     pictureUrl: string | undefined | null,
