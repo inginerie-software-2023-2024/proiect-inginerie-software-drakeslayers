@@ -12,6 +12,7 @@ jobs:
   build-frontend:
     name: Build frontend
     runs-on: ubuntu-latest
+    if: (contains(github.event.commits.*.added, 'frontend') || contains(github.event.commits.*.modified, 'frontend'))
     defaults:
       run:
         working-directory: frontend
@@ -34,7 +35,6 @@ jobs:
   deploy-frontend:
     name: Deploy frontend
     runs-on: ubuntu-latest
-    if: (contains(github.event.commits.*.added, 'frontend') || contains(github.event.commits.*.modified, 'frontend'))
     needs: build-frontend
     steps:
       #      - name: Checkout repository
