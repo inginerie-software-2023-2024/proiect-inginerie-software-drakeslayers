@@ -40,8 +40,15 @@
 <!-- Action buttons -->
 <div class="action-btns">
   <button mat-flat-button class="cancel-btn" color="warn" mat-dialog-close>Cancel</button>
-  <button mat-flat-button class="create-btn" color="primary" [disabled]="addedProfiles.length === 0">
-    Create chat
+  <button
+    mat-flat-button
+    class="create-btn"
+    color="primary"
+    [disabled]="addedProfiles.length === 0 || loadingCreateChat"
+    (click)="createChat()"
+  >
+    <span *ngIf="!loadingCreateChat">Create chat</span>
+    <mat-spinner *ngIf="loadingCreateChat" [diameter]="24"></mat-spinner>
   </button>
 </div>
 

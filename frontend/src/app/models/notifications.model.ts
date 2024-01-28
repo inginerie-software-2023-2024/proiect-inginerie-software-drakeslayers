@@ -3,11 +3,11 @@ import { Post } from './post.model';
 import { Profile } from './profile.model';
 
 export enum NotificationType {
-FollowRequest='FollowRequest',
-PostLike='PostLike',
-CommentLike="CommentLike",
-NewComment="NewComment",
-NewReply="NewReply",
+  FollowRequest = 'FollowRequest',
+  PostLike = 'PostLike',
+  CommentLike = 'CommentLike',
+  NewComment = 'NewComment',
+  NewReply = 'NewReply'
 }
 
 export interface Notification {

@@ -133,7 +133,7 @@ class ChatService {
         return knexInstance
             .select('Chats.*')
             .from('Chats')
-            .join('ChatUsers', 'Chats.chatId', '=', 'ChatUsers.chatId')
+            .join('ChatUsers', 'Chats.id', '=', 'ChatUsers.chatId')
             .where('ChatUsers.userId', userId)
             .then((chats: Chat[]) => {
                 const promises: Promise<Chat>[] = [];

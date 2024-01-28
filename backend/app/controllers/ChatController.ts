@@ -7,13 +7,12 @@ import { defaultProfilePictureURL } from './ProfileController';
 
 export class ChatController {
     createChat(req: Request, res: Response, next: NextFunction) {
-
-        if (!req?.body?.name){
-            const error = craftError(errorCodes.noContent, "Chat name cannot be null!");
+        if (!req?.body?.name && req?.body?.isGroup){
+            const error = craftError(errorCodes.noContent, "Group name cannot be null!");
             return res.status(403).json({ error, content: undefined });
         }
 
-        if (req.body.members.length > 1 && req.body.isGroup === false){
+        if (req.body.memberIds.length > 1 && req.body.isGroup === false){
             const error = craftError(errorCodes.noContent, "Cannot have 1-1 chat with more than 2 users!");
             return res.status(400).json({ error, content: undefined });
         }
@@ -23,15 +22,15 @@ export class ChatController {
             name: req.body.name,
             createdAt: new Date(),
             isGroup: req.body.isGroup,
-            pictureUrl: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
+            pictureUrl: req.file === undefined ? defaultProfilePictureURL : req.file?.filename || '',
         };
 
-        const members: String[] = [req.session.user!.id];
-        if (req.body.members){
-            members.push(...req.body.members);
+        const memberIds: String[] = [req.session.user!.id];
+        if (req.body.memberIds){
+            memberIds.push(...req.body.memberIds);
         }
 
-        return chatService.createChat(chat, members)
+        return chatService.createChat(chat, memberIds)
         .then(() => res.status(200).json({ error: undefined, content: chat }))
         .catch(err => {
             console.error(err.message);
