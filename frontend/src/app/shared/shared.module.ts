@@ -9,8 +9,16 @@ import { ProfileLinkPipe } from './pipes/profile-link.pipe';
 import { ApiPrefixPipe } from './pipes/api-prefix.pipe';
 import { PostLinkPipe } from './pipes/post-link.pipe';
 import { TimestampToHourPipe } from './pipes/timestamp-to-hour.pipe';
+import { TimestampToDatePipe } from './pipes/timestamp-to-date.pipe';
 
-const PIPES = [FormControlErrorMessagePipe, ProfileLinkPipe, PostLinkPipe, ApiPrefixPipe, TimestampToHourPipe];
+const PIPES = [
+  FormControlErrorMessagePipe,
+  ProfileLinkPipe,
+  PostLinkPipe,
+  ApiPrefixPipe,
+  TimestampToHourPipe,
+  TimestampToDatePipe
+];
 
 @NgModule({
   exports: [
@@ -22,6 +30,6 @@ const PIPES = [FormControlErrorMessagePipe, ProfileLinkPipe, PostLinkPipe, ApiPr
     BrowserAnimationsModule,
     ...PIPES
   ],
-  declarations: [...PIPES, TimestampToHourPipe]
+  declarations: [...PIPES]
 })
 export class SharedModule {}

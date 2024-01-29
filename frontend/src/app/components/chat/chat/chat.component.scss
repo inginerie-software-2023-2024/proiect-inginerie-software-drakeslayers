@@ -72,12 +72,24 @@
   padding: 8px;
   border-radius: 8px;
   background-color: $gray-200;
+
+  .message-date {
+    @include typography-levels.small;
+    margin-left: 16px;
+    color: $gray-600;
+  }
 }
 
-.message-date {
-  @include typography-levels.small;
-  margin-left: 16px;
-  color: $gray-600;
+.beginning-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .message-text {
+    margin: 0;
+    text-align: center;
+    color: $gray-600;
+  }
 }
 
 .footer {

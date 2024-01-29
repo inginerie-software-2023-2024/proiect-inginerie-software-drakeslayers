@@ -9,12 +9,13 @@
 .chats-list-container {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
+  width: calc(100vw / 4);
+  min-width: 240px;
   max-width: 400px;
   border-right: $separator-300;
 }
 
 .chat-container {
-  flex: 4 1 auto;
+  flex: 1;
   height: 100%;
 }

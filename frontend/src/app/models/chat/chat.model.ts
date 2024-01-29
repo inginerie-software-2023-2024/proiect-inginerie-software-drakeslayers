@@ -1,7 +1,7 @@
 export interface Chat {
   id: string;
   name: string;
-  createdAt: Date;
+  createdAt: string;
   isGroup: boolean;
   pictureUrl: string;
 }

@@ -1,4 +1,6 @@
-<ng-container *ngIf="{ activeChat: activeChat$ | async, currentUser: currentUser$ | async } as data">
+<ng-container
+  *ngIf="{ activeChat: activeChat$ | async, currentUser: currentUser$ | async, messages: messages$ | async } as data"
+>
   <ng-container *ngIf="data.activeChat; else noChatOpened">
     <div class="chat-container">
       <div class="header">
@@ -10,8 +12,14 @@
 
       <div class="messages-container">
         <ng-container
-          *ngFor="let message of data.activeChat.messages"
-          [ngTemplateOutlet]="data.activeChat.chat.isGroup ? groupMessage : oneToOneMessage"
+          *ngFor="let message of data.messages"
+          [ngTemplateOutlet]="
+            message.authorId === 'system'
+              ? systemMessage
+              : data.activeChat.chat.isGroup
+              ? groupMessage
+              : oneToOneMessage
+          "
           [ngTemplateOutletContext]="{ message: message, currentUser: data.currentUser }"
         ></ng-container>
       </div>
@@ -41,6 +49,15 @@
     <mds-profile-pic></mds-profile-pic>
     {{ message.text }}
   </div>
+</ng-template>
+
+<ng-template #systemMessage let-message="message">
+  <ng-container [ngSwitch]="message.id">
+    <div *ngSwitchCase="'beginning'" class="beginning-message-container message-container">
+      <p class="message-text">{{ message.sentAt | timestampToDate }}</p>
+      <p class="message-text">{{ message.text }}</p>
+    </div>
+  </ng-container>
 </ng-template>
 
 <ng-template #noChatOpened>
