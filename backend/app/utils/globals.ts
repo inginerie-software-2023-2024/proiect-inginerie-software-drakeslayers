@@ -328,7 +328,6 @@ export function uploadMediaChatPicture(req: Request, res: Response, next: NextFu
 
 // middleware to verify if a profile exists
 export function ProfileExists(req: Request, res: Response, next: NextFunction) {
-    console.log("sunt in profile exists");
     const userId = req.session.user!.id;
     getProfileByUserId(userId)
       .then((profile) => {
@@ -349,8 +348,6 @@ export function ProfileExists(req: Request, res: Response, next: NextFunction) {
 
 // middleware to verify if a profile does not exists
 export function ProfileDoesNotExist(req: Request, res: Response, next: NextFunction) {
-    console.log("sunt in profile does not exists");
-
     const userId = req.session.user!.id;
     getProfileByUserId(userId)
       .then((profile) => {
