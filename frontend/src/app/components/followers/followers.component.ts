@@ -37,8 +37,11 @@ export class FollowersComponent {
       .getFollowers(userId)
       .pipe(handleError())
       .subscribe((response) => {
-        const followerIds = response.content.map((follower) => follower.followedBy);
-        this.profileService.getProfileRange(followerIds).subscribe((response) => {
+        const acceptedFollowers = response.content
+        .filter(follower => follower.accepted === true)
+        .map(follower => follower.followedBy);
+
+        this.profileService.getProfileRange(acceptedFollowers).subscribe((response) => {
           this.followersList = response.content;
           this.numFollowers = this.followersList.length;
           this.loadProfilePictures();
@@ -51,9 +54,11 @@ export class FollowersComponent {
       .getFollows(userId)
       .pipe(handleError())
       .subscribe((response) => {
-        const followingIds = response.content.map((follower) => follower.follows);
+        const acceptedFollowers = response.content
+        .filter(follower => follower.accepted === true)
+        .map(follower => follower.followedBy);
         this.profileService
-          .getProfileRange(followingIds)
+          .getProfileRange(acceptedFollowers)
           .pipe(handleError())
           .subscribe((response) => {
             this.followsList = response.content;

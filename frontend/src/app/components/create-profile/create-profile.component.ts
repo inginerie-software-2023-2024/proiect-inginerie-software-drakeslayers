@@ -8,7 +8,6 @@ import { GenericResponse } from 'app/models/generic-response.model';
 import { Profile } from 'app/models/profile.model';
 import { CreateProfileFormType } from './create-profile.type';
 import { MatStepper } from '@angular/material/stepper';
-import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-create-profile-profile',

@@ -1,5 +1,6 @@
 <div class="notifications">
   <div *ngFor="let notification of notifications$ | async">
     <mds-notification [notification]="notification.notification" [profile]="notification.profile"></mds-notification>
+    <button mat-button class="mat-accent" (click)="removeNotification(notification.notification)">Remove</button>
   </div>
 </div>

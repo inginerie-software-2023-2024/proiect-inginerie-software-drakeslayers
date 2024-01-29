@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ClientSocket, SocketAuth } from 'app/models/socket.model';
+import { ClientSocket, SocketAuth, SocketTypeEnum } from 'app/models/socket.model';
 import { io } from 'socket.io-client';
 import { UserService } from './user.service';
 import { NotificationWithData } from 'app/models/notifications.model';
@@ -21,7 +21,9 @@ export class NotificationsService {
   }
 
   private createConnection(userId: string | undefined = undefined): ClientSocket {
-    return io('https://localhost:8080', { autoConnect: false, auth: { userId } });
+    const socketAuth: SocketAuth = { userId, socketType: SocketTypeEnum.notifications };
+
+    return io('https://localhost:8080', { autoConnect: false, auth: socketAuth });
   }
 
   public onSocketButton(): void {
@@ -41,6 +43,12 @@ export class NotificationsService {
     this.socket.connect();
 
     this.socket.on('followRequestNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+
+    this.socket.on('newFollowerNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
@@ -99,4 +107,12 @@ export class NotificationsService {
     const url = 'api/notifications';
     return this.httpClient.get<GenericResponse<NotificationWithData[]>>(url);
   }
+
+  public removeNotification(notificationId: string): void {
+    const currentNotifications = this.newNotificationsSubject.value;
+    const updatedNotifications = currentNotifications.filter(notification => notification.notification.id !== notificationId);
+    this.newNotificationsSubject.next(updatedNotifications);
+    this.httpClient.delete(`api/notifications/${notificationId}`, { withCredentials: true }).subscribe(/* gestionează răspunsul */);
+  }
+
 }

@@ -106,13 +106,11 @@ export class ProfileController {
 
     getProfileRange(req: Request, res: Response, next: NextFunction) {
         const idList = req.body.usersIds;
-        console.log(idList);
         knexInstance
             .select('*')
             .from('Profiles')
             .whereIn('userId', idList)
             .then(arr => {
-                console.log(arr);
                 return res.status(200).json({ error: undefined, content: arr });
             })
             .catch(err => {
@@ -171,7 +169,6 @@ export class ProfileController {
             isPrivate: req.body.isPrivate,
             hashtags: [],
         }
-        console.log(profile.isPrivate);
 
         knexInstance('Profiles')
             .insert(profile)
@@ -207,8 +204,6 @@ export class ProfileController {
                 if (req.body.isPrivate !== undefined){
                     updatedProfile.isPrivate = req.body.isPrivate;
                 }
-
-                console.log(updatedProfile.isPrivate);
 
                 if (req.file) {
                     // Delete the old profile picture
