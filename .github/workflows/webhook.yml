@@ -48,12 +48,12 @@ jobs:
 
 
     steps:
-      - name: Setup DB
-        run: |
-          psql -U brontosaur -d dbMDS -a -f sql/dbMDS.sql  
-
       - name: Check out repository code
         uses: actions/checkout@v4
+
+      - name: Setup DB
+        run: |
+          psql -U brontosaur -d dbMDS -a -f sql/dbMDS.sql 
 
       - name: Install dependencies Python
         working-directory: backend-python
