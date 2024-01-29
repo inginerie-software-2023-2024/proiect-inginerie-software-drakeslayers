@@ -3,8 +3,8 @@ import { authenticationController, profileController, uploadMediaProfiles, Profi
 
 export const profileRouter = express.Router();
 
-profileRouter.get('/profiles/:id', profileController.getProfile);
 profileRouter.get('/profiles/search', profileController.searchProfiles);
+profileRouter.get('/profiles/:id', profileController.getProfile);
 profileRouter.get('/profiles/:id/profilePicture', profileController.getProfilePicture)
 profileRouter.post('/profiles', authenticationController.isAuthenticated, ProfileDoesNotExist, uploadMediaProfiles, profileController.create);
 profileRouter.post('/profiles/users', profileController.getProfileRange);

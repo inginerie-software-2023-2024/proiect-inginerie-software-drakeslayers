@@ -57,7 +57,7 @@ class ChatService {
 
     }
 
-    public readMessages(userId: string, chatId: string): Promise<any>{
+    public getMessages(userId: string, chatId: string): Promise<any>{
         const lastRead = new Promise(resolve => {
             return knexInstance('ChatUsers')
                 .select('lastRead')
@@ -77,14 +77,14 @@ class ChatService {
 
         const messages = knexInstance('ChatMessages').where({chatId});
 
-        return Promise.all([lastRead, messages])
-        .then(( [lastRead, messages] ) => {
-            return knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId, chatId})
-            .then(() => ({ lastRead, messages}));
-        });
+        return Promise.all([lastRead, messages]).then(([lastRead, messages]) => ({ lastRead, messages }));
     }
 
-    public createChat(chat: Chat, members: String[]): Promise<any>{
+    public readMessages(userId: string, chatId: string): Promise<any>{
+        return knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId, chatId});
+    }
+
+    public createChat(chat: Chat, members: String[], requesterId: string): Promise<Chat | undefined>{
         return knexInstance
                .transaction(trx => 
 
@@ -100,7 +100,25 @@ class ChatService {
                         }
                     })
                     // map members of chat to room
-                    .then(() => trx('ChatUsers').insert(members.map(x => ({chatId: chat.id, userId: x, lastRead: new Date()})))));
+                    .then(() => trx('ChatUsers').insert(members.map(x => ({chatId: chat.id, userId: x, lastRead: new Date()})))))
+                    .then(() => {
+                        if (!chat.isGroup){
+                            return getChatMembers(chat.id!)
+                            .then(members => {
+                                for (let i = 0; i < members.length; ++i)
+                                    if (members[i] !== requesterId){
+                                        return getProfileByUserId(members[i])
+                                        .then((profile: Profile | undefined) => {
+                                            chat.pictureUrl = profile?.profilePictureURL;
+                                            chat.name = profile?.name === undefined ? profile?.username : profile.name;
+                                            return chat;
+                                        })
+                                    }
+                            })
+                        }
+
+                        return chat;
+                    })
     }
 
     public getSingleChat(requesterId:string, chatId: string): Promise<Chat | undefined> {
@@ -120,7 +138,7 @@ class ChatService {
                                 return getProfileByUserId(members[i])
                                 .then((profile: Profile | undefined) => {
                                     chat.pictureUrl = profile?.profilePictureURL;
-
+                                    chat.name = profile?.name === undefined ? profile?.username : profile.name;
                                     return chat;
                                 })
                             }
@@ -133,7 +151,7 @@ class ChatService {
         return knexInstance
             .select('Chats.*')
             .from('Chats')
-            .join('ChatUsers', 'Chats.chatId', '=', 'ChatUsers.chatId')
+            .join('ChatUsers', 'Chats.id', '=', 'ChatUsers.chatId')
             .where('ChatUsers.userId', userId)
             .then((chats: Chat[]) => {
                 const promises: Promise<Chat>[] = [];
@@ -147,6 +165,7 @@ class ChatService {
                                     return getProfileByUserId(members[i])
                                     .then((profile: Profile | undefined) => {
                                         c.pictureUrl = profile?.profilePictureURL;
+                                        c.name = profile?.name === undefined ? profile?.username : profile.name;
                                         return c;
                                     })
                                 }

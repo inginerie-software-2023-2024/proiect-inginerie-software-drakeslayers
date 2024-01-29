@@ -1,73 +1,103 @@
 import { Injectable } from '@angular/core';
-import { ClientSocket, SocketAuth } from 'app/models/socket.model';
-import { io } from 'socket.io-client';
+import { ClientSocket } from 'app/models/socket/socket.model';
 import { UserService } from './user.service';
 import { NotificationWithData } from 'app/models/notifications.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GenericResponse } from 'app/models/generic-response.model';
 import { HttpClient } from '@angular/common/http';
+import { SocketService } from './socket.service';
+import { SocketIdEnum } from 'app/models/socket/socket-id.enum';
+import { SocketTypeEnum } from 'app/models/socket/socket-type.enum';
+import { SocketAuth } from 'app/models/socket/socket-auth.model';
+
+const SOCKET_ID = SocketIdEnum.notifications;
+const SOCKET_TYPE = SocketTypeEnum.notifications;
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationsService {
-  private socket: ClientSocket;
-
   private readonly newNotificationsSubject = new BehaviorSubject<NotificationWithData[]>([]);
   public readonly newNotifications$ = this.newNotificationsSubject.asObservable();
 
-  constructor(private readonly userService: UserService, private readonly httpClient: HttpClient) {
-    this.socket = this.createConnection();
+  constructor(
+    private readonly userService: UserService,
+    private readonly httpClient: HttpClient,
+    private readonly socketService: SocketService
+  ) {
+    this.createConnection();
   }
 
   private createConnection(userId: string | undefined = undefined): ClientSocket {
-    return io('https://promeret.social:443', { autoConnect: false, auth: { userId } });
+
+    const socketAuth: SocketAuth = { userId, socketType: SocketTypeEnum.notifications };
+
+    return this.socketService.add(SOCKET_ID, false, socketAuth);
+  }
+
+  private connectSocket(): void {
+    this.socketService.connect(SOCKET_ID);
+  }
+
+  private disconnectSocket(): void {
+    this.socketService.disconnect(SOCKET_ID);
+  }
+
+  private getSocket(): ClientSocket | undefined {
+    return this.socketService.get(SOCKET_ID);
+
   }
 
   public onSocketButton(): void {
-    this.socket.connect();
-    this.socket.emit('any');
+    this.connectSocket();
+    this.getSocket()?.emit('any');
   }
 
   public get socketAuth(): SocketAuth {
-    return this.socket.auth as SocketAuth;
+    return this.getSocket()?.auth as SocketAuth;
   }
 
   public get isConnected(): boolean {
-    return this.socket?.connected || false;
+    return this.getSocket()?.connected || false;
   }
 
   private startListening(): void {
-    console.log('\n\n\n\n\nCONNECTION REALISED\n\n\n\n\n');
-    this.socket.connect();
 
-    console.log(this.socket.connected);
+    this.connectSocket();
+    const socket = this.getSocket()!;
 
-    this.socket.on('followRequestNotification', (notification: NotificationWithData) => {
+    socket.on('followRequestNotification', (notification: NotificationWithData) => {
+
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
     });
 
-    this.socket.on('postLikeNotification', (notification: NotificationWithData) => {
+    socket.on('newFollowerNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
     });
 
-    this.socket.on('commentLikeNotification', (notification: NotificationWithData) => {
+    socket.on('postLikeNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
     });
 
-    this.socket.on('newCommentNotification', (notification: NotificationWithData) => {
+    socket.on('commentLikeNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
     });
 
-    this.socket.on('newReplyNotification', (notification: NotificationWithData) => {
+    socket.on('newCommentNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+
+    socket.on('newReplyNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
@@ -80,27 +110,35 @@ export class NotificationsService {
 
     this.userService.currentUser$.subscribe((user) => {
       if (!user && this.socketAuth.userId !== undefined) {
-        this.socket.disconnect();
-        this.socket = this.createConnection();
+        this.disconnectSocket();
+        this.createConnection();
         this.startListening();
       } else if (!!user && this.socketAuth.userId !== user.id) {
-        this.socket.disconnect();
-        this.socket = this.createConnection(user.id);
+        this.disconnectSocket();
+        this.createConnection(user.id);
         this.startListening();
       }
     });
   }
 
   public connect(): void {
-    this.socket.connect();
+    this.connectSocket();
   }
 
   public disconnect(): void {
-    this.socket.disconnect();
+    this.disconnectSocket();
   }
 
   public getNotifications(): Observable<GenericResponse<NotificationWithData[]>> {
     const url = 'api/notifications';
     return this.httpClient.get<GenericResponse<NotificationWithData[]>>(url);
   }
+
+  public removeNotification(notificationId: string): void {
+    const currentNotifications = this.newNotificationsSubject.value;
+    const updatedNotifications = currentNotifications.filter(notification => notification.notification.id !== notificationId);
+    this.newNotificationsSubject.next(updatedNotifications);
+    this.httpClient.delete(`api/notifications/${notificationId}`, { withCredentials: true }).subscribe(/* gestionează răspunsul */);
+  }
+
 }

@@ -32,7 +32,8 @@ export class CreateProfileComponent implements OnInit {
   public readonly profileForm: FormGroup<Partial<CreateProfileFormType>> = this.fb.group({
     username: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(15)]],
     name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(15)]],
-    bio: ['', Validators.maxLength(50)]
+    bio: ['', Validators.maxLength(50)],
+    isPrivate: ['false', Validators.required]
   }) as FormGroup<Partial<CreateProfileFormType>>;
 
   onSubmit(): void {
@@ -41,7 +42,8 @@ export class CreateProfileComponent implements OnInit {
         metadata: {
           username: this.username.value,
           name: this.name.value,
-          bio: this.bio.value
+          bio: this.bio.value,
+          isPrivate: this.isPrivate.value
         },
         media: this.profilePicture
       };
@@ -82,6 +84,10 @@ export class CreateProfileComponent implements OnInit {
 
   get bio(): FormControl {
     return this.profileForm.get('bio') as FormControl;
+  }
+
+  get isPrivate(): FormControl {
+    return this.profileForm.get('isPrivate') as FormControl;
   }
 
   ngOnInit(): void {}

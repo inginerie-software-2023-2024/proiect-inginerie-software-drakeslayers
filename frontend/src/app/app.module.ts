@@ -35,6 +35,10 @@ import { Observable } from 'rxjs';
 import { NotificationsService } from './core/services/notifications.service';
 import { NotificationComponent } from './components/notifications/notification/notification.component';
 import { PostComponent } from './components/shared/post/post.component';
+import { ChatPageComponent } from './components/chat/chat-page/chat-page.component';
+import { ChatsListComponent } from './components/chat/chats-list/chats-list.component';
+import { ChatComponent } from './components/chat/chat/chat.component';
+import { CreateChatComponent } from './components/chat/create-chat/create-chat.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
   console.log('\n\n\n\n\n\nIn init app factory\n\n\n\n\n\n');
@@ -45,7 +49,7 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
       observer.next();
       observer.complete();
     });
-  }
+  };
 }
 
 @NgModule({
@@ -78,15 +82,21 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
     ShowProfileComponent,
     FollowersComponent,
     NotificationsPageComponent,
-    NotificationComponent
+    NotificationComponent,
+    ChatPageComponent,
+    ChatsListComponent,
+    ChatComponent,
+    CreateChatComponent
   ],
   imports: [BrowserModule, AppRoutingModule, SharedModule, MaterialModule, MatButtonModule],
-  providers: [{
-    provide: APP_INITIALIZER,
-    useFactory: initializeAppFactory,
-    deps: [NotificationsService],
-    multi: true
-  }],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAppFactory,
+      deps: [NotificationsService],
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

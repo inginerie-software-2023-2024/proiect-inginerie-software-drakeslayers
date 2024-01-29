@@ -13,10 +13,11 @@ import { CommentsController } from '../controllers/CommentsController';
 import { FollowersController } from '../controllers/FollowersController';
 import { PostLikesController } from '../controllers/PostLikesController'; 
 import { CommentLikesController } from '../controllers/CommentLikesController'; 
-import { ProfileController, getProfileByUserId } from '../controllers/ProfileController';
+import { ProfileController, defaultProfilePictureURL, getProfileByUserId } from '../controllers/ProfileController';
 import { FeedController } from '../controllers/FeedController';
 import { NotificationsController } from '../controllers/NotificationsController';
 import { ChatController } from '../controllers/ChatController';
+
 
 // database connection
 const knexConfig: Knex.Config = {
@@ -224,7 +225,11 @@ export function craftChatPicturesDest(): string {
 }
 
 export function craftProfilePictureURL(userId: string, pictureName: string): string {
-    return pictureName && pictureName.length > 0 ? path.join("users/", userId, "profile/", pictureName) : "";
+    return pictureName && pictureName.length > 0
+        ? pictureName === defaultProfilePictureURL
+            ? pictureName
+            : path.join('users/', userId, 'profile/', pictureName)
+        : '';
 }
 
 export function moveFiles(dir: string, files: string[], callback: Function) {
@@ -327,7 +332,6 @@ export function uploadMediaChatPicture(req: Request, res: Response, next: NextFu
 
 // middleware to verify if a profile exists
 export function ProfileExists(req: Request, res: Response, next: NextFunction) {
-    console.log("sunt in profile exists");
     const userId = req.session.user!.id;
     getProfileByUserId(userId)
       .then((profile) => {
@@ -348,8 +352,6 @@ export function ProfileExists(req: Request, res: Response, next: NextFunction) {
 
 // middleware to verify if a profile does not exists
 export function ProfileDoesNotExist(req: Request, res: Response, next: NextFunction) {
-    console.log("sunt in profile does not exists");
-
     const userId = req.session.user!.id;
     getProfileByUserId(userId)
       .then((profile) => {

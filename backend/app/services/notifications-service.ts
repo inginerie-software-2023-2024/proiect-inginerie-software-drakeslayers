@@ -24,7 +24,7 @@ class NotificationsService {
             id: uuidv4(),
             createdAt: new Date(),
             userId: followedBy,
-            type: NotificationType.FollowRequest,
+            type: follower.accepted == true ? NotificationType.NewFollower : NotificationType.FollowRequest,
             content: follower
         };
 
@@ -49,7 +49,6 @@ class NotificationsService {
                             trx('NotificationRecipients')
                                 .insert(notificationRecipient)
                                 .then((arr) => {
-                                    console.log('arr 2', arr.length);
                                     if (arr.length === 0) {
                                         throw {
                                             error: craftError(errorCodes.other, 'Please try again!'),
@@ -65,7 +64,11 @@ class NotificationsService {
                 getProfileByUserId(follower.followedBy).then((followerProfile) => {
                     const socket = this.socketsService.getSocket(follower.follows) as CustomSocket;
                     if (!!socket && !!followerProfile) {
-                        socket.emit('followRequestNotification', { notification, profile: followerProfile });
+                        if (follower.accepted) {
+                            socket.emit('newFollowerNotification', { notification, profile: followerProfile });
+                        } else {
+                            socket.emit('followRequestNotification', { notification, profile: followerProfile });
+                        }
                     }
                 });
             });
@@ -102,7 +105,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -160,7 +162,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -217,7 +218,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -241,7 +241,6 @@ class NotificationsService {
     }
 
     public sendNewReplyNotification(comment: Comment, commentAuthorId: string): void {
-        console.log(commentAuthorId)
         if (comment.userId == commentAuthorId) {
             return;
         }
@@ -275,7 +274,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),

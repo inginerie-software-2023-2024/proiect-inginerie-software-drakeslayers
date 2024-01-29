@@ -148,3 +148,17 @@
 .comments mat-icon {
   margin-right: 5px;
 }
+
+.private-message {
+  background-color: #f0f0f0; /* Culoarea de fundal a mesajului */
+  padding: 15px; /* Spațiere în jurul textului */
+  border: 2px solid #cccccc; /* Bordură pentru evidențiere */
+  border-radius: 8px; /* Colțuri rotunjite */
+  text-align: center;
+  margin-top: 20px;
+}
+
+.private-message-text {
+  color: #333333; /* Culoarea textului */
+  font-weight: bold; /* Textul bold */
+}

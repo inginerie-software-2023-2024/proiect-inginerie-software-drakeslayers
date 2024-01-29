@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NotificationsService } from 'app/core/services/notifications.service';
+import { Notification } from 'app/models/notifications.model';
 import { combineLatest, map } from 'rxjs';
 
 @Component({
@@ -29,5 +30,9 @@ export class NotificationsPageComponent {
       this.toggleButtonText = 'Disconnect';
       this.notificationsService.connect();
     }
+  }
+
+  public removeNotification(notification: Notification): void {
+    this.notificationsService.removeNotification(notification.id);
   }
 }

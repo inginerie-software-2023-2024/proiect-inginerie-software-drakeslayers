@@ -26,6 +26,10 @@ export class ProfileService {
       formData.append('bio', data.metadata.bio);
     }
 
+    if (data.metadata.isPrivate) {
+      formData.append('isPrivate', data.metadata.isPrivate);
+    }
+
     if (data.media) {
       formData.append('media', data.media);
     }
@@ -43,6 +47,11 @@ export class ProfileService {
   public getProfileRange(usersIds: string[]): Observable<GenericResponse<Profile[]>> {
     const url = 'api/profiles/users';
     return this.httpClient.post<GenericResponse<Profile[]>>(url, { usersIds });
+  }
+
+  public getProfilesByNameOrUsername(name: string): Observable<GenericResponse<Profile[]>> {
+    const url: string = '/api/profiles/search';
+    return this.httpClient.get<GenericResponse<Profile[]>>(url, { params: { name } });
   }
 
   public getProfilePicture(id: string): Observable<GenericResponse<Partial<Profile>>> {
@@ -75,11 +84,15 @@ export class ProfileService {
       formData.append('bio', data.metadata.bio);
     }
 
+    if (data.metadata.isPrivate) {
+      formData.append('isPrivate', data.metadata.isPrivate);
+    }
+
     if (data.media) {
       formData.append('media', data.media);
     }
 
-    if (formData.has('username') || formData.has('name') || formData.has('bio') || formData.has('media')) {
+    if (formData.has('username') || formData.has('name') || formData.has('bio') || formData.has('media') || formData.has('isPrivate')) {
       return this.httpClient.patch<GenericResponse<Partial<Profile>>>('/api/profiles', formData, {
         withCredentials: true
       });

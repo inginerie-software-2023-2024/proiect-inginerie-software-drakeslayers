@@ -10,35 +10,43 @@
           <div class="username-container">
             <h2 class="username">{{ profile.username }}</h2>
             <button routerLink="/edit-profile" routerLinkActive="active" mat-raised-button *ngIf="(isCurrentUserProfile$ | async)" mat-stroked-button class="edit-profile-button">Edit profile</button>
-            <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && !(isFollowing$ | async)" mat-stroked-button class="follow-button" (click)="follow()"> Follow </button>
+            <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && !(isFollowing$ | async) && !(isRequested$ | async)" mat-stroked-button class="follow-button" (click)="follow()"> Follow </button>
+            <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && (isRequested$ | async)" mat-stroked-button class="follow-button" (click)="unfollow()"> Cancel request </button>
             <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && (isFollowing$ | async)" mat-stroked-button class="follow-button" (click)="unfollow()"> Unfollow </button>
           </div>
-
           <div class="follow-info">
             <mds-followers [userId]="profile.userId"></mds-followers>
           </div>
         </div>
 
       </div>
-      <div class="bio">
-        <p>Bio: {{ profile.bio }}</p>
-      </div>
 
-      <div class="post-grid">
-        <div *ngFor="let post of posts" class="post-card">
-          <img [src]="post.picturesURLs[0] | apiPrefix" class="post-image">
-          <div class="post-overlay" (click)="openPost(post.id)">
-            <div class="likes">
-              <mat-icon>favorite</mat-icon>
-              <span>{{ post.likesCount }}</span>
-            </div>
-            <div class="comments">
-              <mat-icon>comment</mat-icon>
-              <span>{{ post.commentsCount }}</span>
+      <div *ngIf="(isCurrentUserProfile$ | async) || (isFollowing$ | async) || (!profile.isPrivate); else privateMessage">
+        <div class="bio">
+          <p>Bio: {{ profile.bio }}</p>
+        </div>
+
+        <div class="post-grid">
+          <div *ngFor="let post of posts" class="post-card">
+            <img [src]="post.picturesURLs[0] | apiPrefix" class="post-image">
+            <div class="post-overlay" (click)="openPost(post.id)">
+              <div class="likes">
+                <mat-icon>favorite</mat-icon>
+                <span>{{ post.likesCount }}</span>
+              </div>
+              <div class="comments">
+                <mat-icon>comment</mat-icon>
+                <span>{{ post.commentsCount }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <ng-template #privateMessage>
+        <div class="private-message">
+          <p class="private-message-text">This profile is private.</p>
+        </div>
+      </ng-template>
 
     </mat-card-content>
   </mat-card>

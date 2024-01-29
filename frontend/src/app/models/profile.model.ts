@@ -5,4 +5,5 @@ export interface Profile {
     name: string,
     profilePictureURL: string,
     bio?: string,
+    isPrivate: string,
 }

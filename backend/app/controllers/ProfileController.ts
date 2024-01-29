@@ -5,7 +5,7 @@ import { File, Post, craftPictureDest, deleteFiles, moveFiles, zipDirectory } fr
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
-const defaultProfilePictureURL = "defaultImage.png";
+export const defaultProfilePictureURL = "defaultImage.png";
 
 function getProfileMetaData(profile: Profile): Partial<Profile> {
     let profileMetaData: Partial<Profile> = {
@@ -106,13 +106,11 @@ export class ProfileController {
 
     getProfileRange(req: Request, res: Response, next: NextFunction) {
         const idList = req.body.usersIds;
-        console.log(idList);
         knexInstance
             .select('*')
             .from('Profiles')
             .whereIn('userId', idList)
             .then(arr => {
-                console.log(arr);
                 return res.status(200).json({ error: undefined, content: arr });
             })
             .catch(err => {
@@ -128,7 +126,13 @@ export class ProfileController {
             .select('*')
             .where('username', 'like', `%${name}%`)
             .orWhere('name', 'like', `%${name}%`)
-            .then((profiles: Profile[]) => res.status(200).json({ error: undefined, content: profiles }))
+            .then((profiles: Profile[]) => res.status(200).json({ 
+                error: undefined, 
+                content: profiles.map((profile => ({
+                    ...profile, 
+                    profilePictureURL: craftProfilePictureURL(profile.userId, profile.profilePictureURL)
+                }))) 
+            }))
             .catch(err => {
                 console.error(err.message);
                 const error = craftError(errorCodes.other, "Please try again!");
@@ -168,7 +172,7 @@ export class ProfileController {
             name: req.body.name,
             profilePictureURL: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
             bio: req.body.bio,
-            isPrivate: req.body.isPrivate ? true  : false,
+            isPrivate: req.body.isPrivate,
             hashtags: [],
         }
 

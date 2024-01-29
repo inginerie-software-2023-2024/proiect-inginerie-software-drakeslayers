@@ -1,0 +1,41 @@
+<div class="new-chat-btn-container">
+  <h5 class="title">Chats</h5>
+  <div class="spacer"></div>
+  <button mat-raised-button class="new-chat-btn" (click)="openCreateChatDialog()">
+    <mat-icon>add</mat-icon>
+    New Chat
+  </button>
+</div>
+
+<div class="chats-list-container" (click)="clearSelection()">
+  <ng-container *ngIf="chatsWithMessages.length > 0; else noChats">
+    <div
+      *ngFor="let obj of chatsWithMessages"
+      class="chat-container"
+      [class.active]="obj.chat.id === activeChatId"
+      (click)="onChatClick(obj.chat.id); $event.stopPropagation()"
+    >
+      <img class="chat-picture" [src]="obj.chat.pictureUrl | apiPrefix" />
+      <div class="chat-info">
+        <div class="name-and-date">
+          <p class="chat-name">{{ obj.chat.name }}</p>
+          <p class="chat-date">
+            {{ (obj.messages.length > 0 ? obj.messages.slice(-1)[0].sentAt : obj.lastRead) | timestampToWhatsapp }}
+          </p>
+        </div>
+        <p class="chat-last-message">
+          {{ obj.messages.length > 0 ? obj.messages.slice(-1)[0].text : "This chat is empty." }}
+        </p>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #noChats>
+  <div class="spacer"></div>
+  <div class="no-chats-container">
+    <p class="faded-p">You don't have any conversations yet.</p>
+    <p class="faded-p">Try starting a new chat.</p>
+  </div>
+  <div class="spacer"></div>
+</ng-template>
