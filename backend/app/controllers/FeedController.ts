@@ -109,6 +109,7 @@ export class FeedController {
                 const followingIDSet: Set<string> = new Set<string>();
                 followers.forEach(x => followingIDSet.add(x.follows));
                 followingIDSet.add(userId);
+
                 const promises: Promise<Post[]>[] = users.map(u => getPostsByUser(u.id));
 
                 Promise.allSettled(promises)

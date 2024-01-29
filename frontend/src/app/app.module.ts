@@ -41,8 +41,10 @@ import { ChatComponent } from './components/chat/chat/chat.component';
 import { CreateChatComponent } from './components/chat/create-chat/create-chat.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
+  console.log('\n\n\n\n\n\nIn init app factory\n\n\n\n\n\n');
   return () => {
     return new Observable((observer) => {
+      console.log('\n\n\n\n\n\nIn OBJ\n\n\n\n\n\n');
       notificationsService.setupSocket();
       observer.next();
       observer.complete();

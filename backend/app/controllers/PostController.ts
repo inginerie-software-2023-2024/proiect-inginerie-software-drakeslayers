@@ -59,28 +59,28 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
 }
 
 async function getHashtags(description: string): Promise<string[]> {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Ignore SSL errors (not recommended for production)
-    let link_to_server: string = "https://localhost:8080"; // TODO: change this to the server's link
-    let route: string = link_to_server + "/extract_hashtags";
 
+    let link_to_server: string = "http://127.0.0.1:5000"; // TODO: change this to the server's link
+    let route: string = link_to_server + "/extract_hashtags";
     return axios
-        .post(route, 
-        {
-            description: description
-        }, 
-        {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.data) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const data = response.data;
-            return data['hashtags'];
-        });
+    .post(route, 
+    {
+        description: description
+    }, 
+    {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.data) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = response.data;
+        return data['hashtags'];
+    });
+
 }
 
 export class PostController {
@@ -106,6 +106,7 @@ export class PostController {
         let description = req.body.description;
 
         const hashtags = await getHashtags(description);
+        // const hashtags = ['New Post'];
 
         let post = {
             id,
@@ -198,7 +199,7 @@ export class PostController {
     // metadata for all posts made by user
     getPostsByUser(req: Request, res: Response, next: NextFunction) {
 
-        const userId = req.query['userid'] as string; 
+        const userId = req.query['userid'] as string;
         isPrivate(userId)
         .then(res => {
             if (!res)
