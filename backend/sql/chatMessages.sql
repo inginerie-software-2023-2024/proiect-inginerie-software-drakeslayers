@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS public."ChatMessages"
     CONSTRAINT "ChatMessages_authorId_fkey" FOREIGN KEY ("authorId")
         REFERENCES public."Users" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON DELETE CASCADE,
     CONSTRAINT "ChatMessages_chatId_fkey" FOREIGN KEY ("chatId")
         REFERENCES public."Chats" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
 )
 
 TABLESPACE pg_default;
