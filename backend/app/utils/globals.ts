@@ -18,6 +18,7 @@ import { FeedController } from '../controllers/FeedController';
 import { NotificationsController } from '../controllers/NotificationsController';
 import { ChatController } from '../controllers/ChatController';
 
+
 // database connection
 const knexConfig: Knex.Config = {
     client: 'postgres',
