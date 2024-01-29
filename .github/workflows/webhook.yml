@@ -21,7 +21,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_DB: dbMDS
-          POSTGRES_USER: runner
+          POSTGRES_USER: brontosaur
           POSTGRES_PASSWORD: 1234
         options: >-
           --health-cmd pg_isready
@@ -51,6 +51,10 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      - name: Setup DB
+        run: |
+          psql -U brontosaur -d dbMDS -a -f sql/dbMDS.sql
+
       - name: Install dependencies Python
         working-directory: backend-python
         run: |
@@ -69,8 +73,7 @@ jobs:
         run: |
           ls
           yarn
-          npm run build
-          (nohup node tsOutput/app/app.js 0<&- &>/dev/null &) && echo "Done!"
+          (nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"
 
       - name: Run Tests
         run: |
