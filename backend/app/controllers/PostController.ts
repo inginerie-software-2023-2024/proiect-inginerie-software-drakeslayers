@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import { isPrivate } from './ProfileController';
 import { isAcceptedFollower } from './FollowersController';
+import axios from 'axios';
 
 
 export function getPostsByUser(userId: string) : Promise<Post[]> {
@@ -60,25 +61,24 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
 async function getHashtags(description: string): Promise<string[]> {
     let link_to_server: string = "localhost:5000"; // TODO: change this to the server's link
     let route: string = link_to_server + "/extract_hashtags";
-    try {
-        const response = await fetch(route, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({description: description}),
-        });
-
-        if (!response.ok) {
+    return axios
+    .post(route, 
+    {
+        description: description
+    }, 
+    {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.data) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+
+        const data = response.data;
         return data['hashtags'];
-    }
-    catch (e) {
-        console.log(e);
-    }
-    return [''];
+    });
 }
 
 export class PostController {
