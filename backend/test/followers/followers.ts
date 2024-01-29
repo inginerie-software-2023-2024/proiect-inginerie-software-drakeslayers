@@ -157,7 +157,6 @@ describe('Follower tests', function () {
                     expect(response.data).to.have.property('content');
                     const following: Follower[] = response.data.content;
                     expect(following).to.be.an('array');
-                    // console.log(posts);
                 });
             });
         });

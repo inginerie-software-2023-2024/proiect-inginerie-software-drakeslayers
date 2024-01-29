@@ -128,7 +128,6 @@ describe('Post tests', function () {
                     expect(response.data).to.have.property('content');
                     const posts: Post[] = response.data.content;
                     expect(posts).to.be.an('array');
-                    // console.log(posts);
                 });
             });
         });
