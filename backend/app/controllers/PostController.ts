@@ -60,7 +60,7 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
 async function getHashtags(description: string): Promise<string[]> {
     let link_to_server: string = "localhost:5000"; // TODO: change this to the server's link
     let route: string = link_to_server + "/extract_hashtags";
-    // try {
+    try {
         const response = await fetch(route, {
             method: 'POST',
             headers: {
@@ -74,11 +74,11 @@ async function getHashtags(description: string): Promise<string[]> {
         }
         const data = await response.json();
         return data['hashtags'];
-    // }
-    // catch (e) {
-    //     console.log(e);
-    // }
-    // return [''];
+    }
+    catch (e) {
+        console.log(e);
+    }
+    return [''];
 }
 
 export class PostController {
@@ -103,7 +103,8 @@ export class PostController {
         let userId = req.session.user!.id;
         let description = req.body.description;
 
-        const hashtags = await getHashtags(description);
+        // const hashtags = await getHashtags(description);
+        const hashtags = ['New Post'];
 
         let post = {
             id,
