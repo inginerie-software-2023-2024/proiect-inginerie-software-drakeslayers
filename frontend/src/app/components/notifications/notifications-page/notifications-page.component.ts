@@ -18,9 +18,7 @@ export class NotificationsPageComponent {
     map(([oldNotifications, newNotifications]) => [...newNotifications, ...oldNotifications])
   );
 
-  constructor(private readonly notificationsService: NotificationsService) {
-    console.log('\n\n\n\n\n\nINIT\n\n\n\n\n\n');
-  }
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   public toggle(): void {
     if (this.notificationsService.isConnected) {

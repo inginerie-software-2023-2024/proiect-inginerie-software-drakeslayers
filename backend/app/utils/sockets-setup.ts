@@ -10,14 +10,12 @@ const chatOnDisconnect = (userId: string) => chatService.getSocketsService().rem
 export const setupSockets = (httpsServer: https.Server): void => {
     const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpsServer, {
         cors: {
-            origin: '*',
-            // allowedHeaders: ['notification'],
+            origin: 'https://localhost:4200',
             credentials: true
         }
     });
 
     io.on('connection', (socket) => {
-        console.log('\n\n\n\n\nConnection realised!\n\n\n\n\n');
         const socketType: string = socket.handshake.auth.socketType;
         const userId: string  = socket.handshake.auth.userId;
 

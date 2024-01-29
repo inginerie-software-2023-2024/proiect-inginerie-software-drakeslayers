@@ -29,7 +29,6 @@ export class NotificationsService {
   }
 
   private createConnection(userId: string | undefined = undefined): ClientSocket {
-
     const socketAuth: SocketAuth = { userId, socketType: SocketTypeEnum.notifications };
 
     return this.socketService.add(SOCKET_ID, false, socketAuth);
@@ -45,7 +44,6 @@ export class NotificationsService {
 
   private getSocket(): ClientSocket | undefined {
     return this.socketService.get(SOCKET_ID);
-
   }
 
   public onSocketButton(): void {
@@ -62,12 +60,10 @@ export class NotificationsService {
   }
 
   private startListening(): void {
-
     this.connectSocket();
     const socket = this.getSocket()!;
 
     socket.on('followRequestNotification', (notification: NotificationWithData) => {
-
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
       this.newNotificationsSubject.next(newNotifications);
@@ -105,7 +101,6 @@ export class NotificationsService {
   }
 
   public setupSocket(): void {
-    console.log('\n\n\n\n\n\nTESTING CSTR SETUP SOCKET\n\n\n\n\n\n');
     this.startListening();
 
     this.userService.currentUser$.subscribe((user) => {
