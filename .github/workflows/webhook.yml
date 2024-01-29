@@ -2,130 +2,175 @@ name: Build & Deploy
 
 on:
   push:
-    branches: [ production ]
+    branches: [ gh-actions-tests ]
   pull_request:
-    branches: [ production ]
+    branches: [ gh-actions-tests ]
   workflow_dispatch:
 
 
 jobs:
-  build-frontend:
-    name: Build frontend
+  test-backend:
+    name: Test backend
     runs-on: ubuntu-latest
-    if: (contains(github.event.commits.*.added, 'frontend') || contains(github.event.commits.*.modified, 'frontend'))
-    defaults:
-      run:
-        working-directory: frontend
+    working-directory: ./backend
+
+#    services:
+#      postgres:
+#        image: postgres
+#        env:
+#          POSTGRES_DB: dbMDS
+#          POSTGRES_USER: runner
+#          POSTGRES_PASSWORD: 1234
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#        ports:
+#          - 5432:5432
+#
+#      redis:
+#        image: redis
+#        options: >-
+#          --health-cmd "redis-cli ping"
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#        ports:
+#          - 6379:6379
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
       - name: Install dependencies
-        run: npm ci
-      - name: Build dependencies
-        run: npm run build
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@main
-        with:
-          name: static-site
-          path: ./frontend/dist/proiect-mdsangular
+        run: npm ci --omit=dev
 
-  deploy-frontend:
-    name: Deploy frontend
-    runs-on: ubuntu-latest
-    needs: build-frontend
-    steps:
-      #      - name: Checkout repository
-      #        uses: actions/checkout@main
-      - name: Download production artifacts
-        uses: actions/download-artifact@main
-        with:
-          name: static-site
-      - name: Test artifact download
-        run: ls -R
-      - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          username: root
-          server: promeret.social
-          port: 22 # default is 22
-          password: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Start server
+        run: sudo bash startup.sh
+
+      - name: Run Tests
+        run: npx ts-mocha -p tsconfig.json test/authentication.ts
 
 
-          # will put all file under this path
-          local_path: ./
-          # files will copy to under remote_path
-          remote_path: /var/www/html
 
-          # sftp args
-          args: '-o ConnectTimeout=5'
-
-  deploy-backend:
-    name: Deploy backend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-      - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          username: root
-          server: promeret.social
-          port: 22 # default is 22
-          password: ${{ secrets.SSH_PRIVATE_KEY }}
-
-          # will put all file under this path
-          local_path: ./backend/*
-          # files will copy to under remote_path
-          remote_path: /root/BackEnd
-
-          # sftp args
-          args: '-o ConnectTimeout=5'
-
-  deploy-backend-python:
-    name: Deploy backend-python
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-      - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          username: root
-          server: promeret.social
-          port: 22 # default is 22
-          password: ${{ secrets.SSH_PRIVATE_KEY }}
-
-          # will put all file under this path
-          local_path: ./backend-python/*
-          # files will copy to under remote_path
-          remote_path: /root/BackEndPython
-
-          # sftp args
-          args: '-o ConnectTimeout=5'
-
-  run:
-    name: Run backend
-    runs-on: ubuntu-latest
-    needs: [deploy-backend, deploy-backend-python]
-    steps:
-      - name: Run
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: promeret.social
-          username: root
-          password: ${{ secrets.SSH_PRIVATE_KEY }}
-          command_timeout: 60s
-          port: 22
-          script: |
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            export OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }}
-            cd /root/BackEndPython
-            pip install -r requirements.txt
-            (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
-            cd /root/BackEnd
-            ./shutdown.sh
-            npm install
-            (nohup ./startup.sh 0<&- &>/dev/null &) && echo "Done!"
+#  build-frontend:
+#    name: Build frontend
+#    runs-on: ubuntu-latest
+#    if: (contains(github.event.commits.*.added, 'frontend') || contains(github.event.commits.*.modified, 'frontend'))
+#    defaults:
+#      run:
+#        working-directory: frontend
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#      - name: List files in the repository
+#        run: |
+#          ls ${{ github.workspace }}
+#      - name: Install dependencies
+#        run: npm ci
+#      - name: Build dependencies
+#        run: npm run build
+#      - name: Archive production artifacts
+#        uses: actions/upload-artifact@main
+#        with:
+#          name: static-site
+#          path: ./frontend/dist/proiect-mdsangular
+#
+#  deploy-frontend:
+#    name: Deploy frontend
+#    runs-on: ubuntu-latest
+#    needs: build-frontend
+#    steps:
+#      #      - name: Checkout repository
+#      #        uses: actions/checkout@main
+#      - name: Download production artifacts
+#        uses: actions/download-artifact@main
+#        with:
+#          name: static-site
+#      - name: Test artifact download
+#        run: ls -R
+#      - name: SFTP Deploy
+#        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#        with:
+#          username: root
+#          server: promeret.social
+#          port: 22 # default is 22
+#          password: ${{ secrets.SSH_PRIVATE_KEY }}
+#
+#
+#          # will put all file under this path
+#          local_path: ./
+#          # files will copy to under remote_path
+#          remote_path: /var/www/html
+#
+#          # sftp args
+#          args: '-o ConnectTimeout=5'
+#
+#  deploy-backend:
+#    name: Deploy backend
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@main
+#      - name: SFTP Deploy
+#        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#        with:
+#          username: root
+#          server: promeret.social
+#          port: 22 # default is 22
+#          password: ${{ secrets.SSH_PRIVATE_KEY }}
+#
+#          # will put all file under this path
+#          local_path: ./backend/*
+#          # files will copy to under remote_path
+#          remote_path: /root/BackEnd
+#
+#          # sftp args
+#          args: '-o ConnectTimeout=5'
+#
+#  deploy-backend-python:
+#    name: Deploy backend-python
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@main
+#      - name: SFTP Deploy
+#        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#        with:
+#          username: root
+#          server: promeret.social
+#          port: 22 # default is 22
+#          password: ${{ secrets.SSH_PRIVATE_KEY }}
+#
+#          # will put all file under this path
+#          local_path: ./backend-python/*
+#          # files will copy to under remote_path
+#          remote_path: /root/BackEndPython
+#
+#          # sftp args
+#          args: '-o ConnectTimeout=5'
+#
+#  run:
+#    name: Run backend
+#    runs-on: ubuntu-latest
+#    needs: [deploy-backend, deploy-backend-python]
+#    steps:
+#      - name: Run
+#        uses: appleboy/ssh-action@v0.1.10
+#        with:
+#          host: promeret.social
+#          username: root
+#          password: ${{ secrets.SSH_PRIVATE_KEY }}
+#          command_timeout: 60s
+#          port: 22
+#          script: |
+#            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+#            export OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }}
+#            cd /root/BackEndPython
+#            pip install -r requirements.txt
+#            (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
+#            cd /root/BackEnd
+#            ./shutdown.sh
+#            npm install
+#            (nohup ./startup.sh 0<&- &>/dev/null &) && echo "Done!"
