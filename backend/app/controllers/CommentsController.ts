@@ -196,11 +196,6 @@ export class CommentsController {
                             }
     
                             return res.status(200).json({ error: undefined, content: arr[0] });
-                        })
-                        .catch(err => {
-                            console.error(err.message);
-                            const error = craftError(errorCodes.other, "Please try again!");
-                            return res.status(500).json({ error, content: undefined });
                         });
                 })
             })

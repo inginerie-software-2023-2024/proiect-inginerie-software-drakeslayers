@@ -302,11 +302,6 @@ export class PostController {
     
                             const metadataPost = getPostMetaData(arr[0]);
                             return res.status(200).json({ error: undefined, content: metadataPost });
-                        })
-                        .catch(err => {
-                            console.error(err.message);
-                            const error = craftError(errorCodes.other, "Please try again!");
-                            return res.status(500).json({ error, content: undefined });
                         });
                 })
             })
