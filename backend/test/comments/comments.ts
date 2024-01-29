@@ -152,7 +152,6 @@ describe('Comment tests', function () {
                     expect(response.data).to.have.property('content');
                     const comments: Comment[] = response.data.content;
                     expect(comments).to.be.an('array');
-                    // console.log(posts);
                 });
             });
         });

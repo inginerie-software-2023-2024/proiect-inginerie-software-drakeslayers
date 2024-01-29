@@ -14,8 +14,14 @@ export interface ClientToServerEvents {
   any: (...args: any[]) => void;
 }
 
+export enum SocketTypeEnum {
+  notifications = 'notifications',
+  chat = 'chat'
+}
+
 export interface SocketAuth {
   userId: string | undefined;
+  socketType: SocketTypeEnum
 }
 
 export interface ClientSocket extends Socket<ServerToClientEvents, ClientToServerEvents> {}

@@ -12,6 +12,7 @@ import { PostPageComponent } from './components/post-page/post-page.component';
 import { ShowProfileComponent } from './components/show-profile/show-profile.component';
 import { IsLoggedInGuard } from './shared/guards/is-logged-in.guard';
 import { NotificationsPageComponent } from './components/notifications/notifications-page/notifications-page.component';
+import { ChatPageComponent } from './components/chat/chat-page/chat-page.component';
 
 const routes: Routes = [
   { path: 'api-tests', component: ApiTestsComponent },
@@ -25,7 +26,7 @@ const routes: Routes = [
   { path: 'feed', component: FeedComponent, canActivate: [IsLoggedInGuard] },
   { path: 'posts/:id', component: PostPageComponent },
   { path: 'profile/:userId', component: ShowProfileComponent },
-  { path: 'api-tests', component: ApiTestsComponent },
+  { path: 'chat', component: ChatPageComponent, canActivate: [IsLoggedInGuard] },
   { path: '', redirectTo: '/feed', pathMatch: 'full' },
 ];
 
