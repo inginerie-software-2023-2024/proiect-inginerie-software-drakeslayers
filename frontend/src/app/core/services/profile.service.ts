@@ -49,6 +49,11 @@ export class ProfileService {
     return this.httpClient.post<GenericResponse<Profile[]>>(url, { usersIds });
   }
 
+  public getProfilesByNameOrUsername(name: string): Observable<GenericResponse<Profile[]>> {
+    const url: string = '/api/profiles/search';
+    return this.httpClient.get<GenericResponse<Profile[]>>(url, { params: { name } });
+  }
+
   public getProfilePicture(id: string): Observable<GenericResponse<Partial<Profile>>> {
     const url: string = `/api/profiles/${id}/profilePicture`;
     return this.httpClient.get<GenericResponse<Partial<Profile>>>(url);

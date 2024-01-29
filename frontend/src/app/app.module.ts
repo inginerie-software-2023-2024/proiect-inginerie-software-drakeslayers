@@ -36,8 +36,9 @@ import { NotificationsService } from './core/services/notifications.service';
 import { NotificationComponent } from './components/notifications/notification/notification.component';
 import { PostComponent } from './components/shared/post/post.component';
 import { ChatPageComponent } from './components/chat/chat-page/chat-page.component';
-import { ConversationsListComponent } from './components/chat/conversations-list/conversations-list.component';
+import { ChatsListComponent } from './components/chat/chats-list/chats-list.component';
 import { ChatComponent } from './components/chat/chat/chat.component';
+import { CreateChatComponent } from './components/chat/create-chat/create-chat.component';
 
 function initializeAppFactory(notificationsService: NotificationsService): () => Observable<any> {
   return () => {
@@ -81,8 +82,9 @@ function initializeAppFactory(notificationsService: NotificationsService): () =>
     NotificationsPageComponent,
     NotificationComponent,
     ChatPageComponent,
-    ConversationsListComponent,
-    ChatComponent
+    ChatsListComponent,
+    ChatComponent,
+    CreateChatComponent
   ],
   imports: [BrowserModule, AppRoutingModule, SharedModule, MaterialModule, MatButtonModule],
   providers: [

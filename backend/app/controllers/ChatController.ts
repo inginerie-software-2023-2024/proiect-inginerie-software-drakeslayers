@@ -3,6 +3,7 @@ import { chatService } from "../services/chat-service";
 import { Chat } from "../utils/chat";
 import { v4 as uuidv4 } from 'uuid';
 import { craftError, errorCodes } from "../utils/error";
+import { defaultProfilePictureURL } from './ProfileController';
 import { isPrivate } from './ProfileController';
 import { isAcceptedFollower } from './FollowersController';
 
@@ -38,13 +39,12 @@ const defaultPictureUrl = "defaultImage.png";
 
 export class ChatController {
     createChat(req: Request, res: Response, next: NextFunction) {
-
-        if (!req?.body?.name){
-            const error = craftError(errorCodes.noContent, "Chat name cannot be null!");
+        if (!req?.body?.name && req?.body?.isGroup){
+            const error = craftError(errorCodes.noContent, "Group name cannot be null!");
             return res.status(403).json({ error, content: undefined });
         }
 
-        if (req.body.members.length > 1 && req.body.isGroup === false){
+        if (req.body.memberIds.length > 1 && req.body.isGroup === false){
             const error = craftError(errorCodes.noContent, "Cannot have 1-1 chat with more than 2 users!");
             return res.status(400).json({ error, content: undefined });
         }
@@ -54,10 +54,10 @@ export class ChatController {
             name: req.body.name,
             createdAt: new Date(),
             isGroup: req.body.isGroup,
-            pictureUrl: req.file === undefined ? defaultPictureUrl : req.file.filename,
+            pictureUrl: req.file === undefined ? defaultProfilePictureURL : req.file?.filename || '',
         };
 
-        const members: String[] = [req.session.user!.id];
+        const memberIds: String[] = [req.session.user!.id];
 
         if (req.body.members){
             return filterPrivateMembers(req.session.user!.id, req.body.members)
@@ -67,8 +67,8 @@ export class ChatController {
                     return res.status(403).json({ error, content: undefined });
                 }
 
-                members.push(...filteredMembers);
-                return chatService.createChat(chat, members)
+                memberIds.push(...filteredMembers);
+                return chatService.createChat(chat, memberIds)
                 .then(() => res.status(200).json({ error: undefined, content: chat }));
             })
             .catch(err => {
@@ -79,8 +79,8 @@ export class ChatController {
         }
 
 
-        return chatService.createChat(chat, members)
-        .then(() => res.status(200).json({ error: undefined, content: chat }))
+        return chatService.createChat(chat, memberIds, req.session.user!.id)
+        .then((chat: Chat | undefined) => res.status(200).json({ error: undefined, content: chat }))
         .catch(err => {
             console.error(err.message);
             const error = craftError(errorCodes.other, "Please try creating chat again!");
@@ -105,9 +105,19 @@ export class ChatController {
                 });
     }
 
+    getMessages(req: Request, res: Response, next: NextFunction) {
+        return chatService.getMessages(req.session.user!.id, req.params.chatId)
+               .then((chatMessages) => res.status(200).json({ error: undefined, content: chatMessages }))
+               .catch(err => {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try reading messages again!");
+                    return res.status(500).json({ error, content: undefined });
+                });
+    }
+
     readMessages(req: Request, res: Response, next: NextFunction) {
         return chatService.readMessages(req.session.user!.id, req.params.chatId)
-               .then((chatMessages) => res.status(200).json({ error: undefined, content: chatMessages }))
+               .then(() => res.status(200).json({ error: undefined, content: undefined }))
                .catch(err => {
                     console.error(err.message);
                     const error = craftError(errorCodes.other, "Please try reading messages again!");

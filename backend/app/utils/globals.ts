@@ -13,7 +13,7 @@ import { CommentsController } from '../controllers/CommentsController';
 import { FollowersController } from '../controllers/FollowersController';
 import { PostLikesController } from '../controllers/PostLikesController'; 
 import { CommentLikesController } from '../controllers/CommentLikesController'; 
-import { ProfileController, getProfileByUserId } from '../controllers/ProfileController';
+import { ProfileController, defaultProfilePictureURL, getProfileByUserId } from '../controllers/ProfileController';
 import { FeedController } from '../controllers/FeedController';
 import { NotificationsController } from '../controllers/NotificationsController';
 import { ChatController } from '../controllers/ChatController';
@@ -225,7 +225,11 @@ export function craftChatPicturesDest(): string {
 }
 
 export function craftProfilePictureURL(userId: string, pictureName: string): string {
-    return pictureName && pictureName.length > 0 ? path.join("users/", userId, "profile/", pictureName) : "";
+    return pictureName && pictureName.length > 0
+        ? pictureName === defaultProfilePictureURL
+            ? pictureName
+            : path.join('users/', userId, 'profile/', pictureName)
+        : '';
 }
 
 export function moveFiles(dir: string, files: string[], callback: Function) {

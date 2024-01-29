@@ -29,6 +29,10 @@ export class UserService {
       .subscribe();
   }
 
+  public get currentUser(): SessionUser | null | undefined {
+    return this.currentUserSubject.value;
+  }
+
   public whoAmI(): Observable<GenericResponse<SessionUser>> {
     return this.httpClient.get<GenericResponse<SessionUser>>('/api/whoami');
   }
