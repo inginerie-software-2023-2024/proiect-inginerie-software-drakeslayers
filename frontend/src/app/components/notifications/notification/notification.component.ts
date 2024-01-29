@@ -1,4 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { FollowerService } from 'app/core/services/follower.service';
+import { NotificationsService } from 'app/core/services/notifications.service';
 import { Notification, NotificationType } from 'app/models/notifications.model';
 import { Profile } from 'app/models/profile.model';
 import { formatInstagramTimestamp } from 'app/shared/utils/date';
@@ -14,12 +16,24 @@ export class NotificationComponent implements OnChanges {
   public dateFormatted: string = '';
   public notificationType = NotificationType;
 
-  constructor() {}
+  constructor(
+    private followerService: FollowerService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['notification'].currentValue) {
       const notification = changes['notification'].currentValue as Notification;
       this.dateFormatted = formatInstagramTimestamp(notification.createdAt);
     }
+  }
+
+  acceptFollowRequest(notification: Notification) {
+    this.followerService
+      .acceptFollow(this.profile.userId)
+      .pipe()
+      .subscribe((response) => {
+        this.notificationsService.removeNotification(notification.id);
+      });
   }
 }

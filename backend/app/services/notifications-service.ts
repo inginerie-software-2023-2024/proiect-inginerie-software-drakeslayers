@@ -24,7 +24,7 @@ class NotificationsService {
             id: uuidv4(),
             createdAt: new Date(),
             userId: followedBy,
-            type: NotificationType.FollowRequest,
+            type: follower.accepted == true ? NotificationType.NewFollower : NotificationType.FollowRequest,
             content: follower
         };
 
@@ -64,7 +64,11 @@ class NotificationsService {
                 getProfileByUserId(follower.followedBy).then((followerProfile) => {
                     const socket = this.socketsService.getSocket(follower.follows) as CustomSocket;
                     if (!!socket && !!followerProfile) {
-                        socket.emit('followRequestNotification', { notification, profile: followerProfile });
+                        if (follower.accepted) {
+                            socket.emit('newFollowerNotification', { notification, profile: followerProfile });
+                        } else {
+                            socket.emit('followRequestNotification', { notification, profile: followerProfile });
+                        }
                     }
                 });
             });

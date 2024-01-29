@@ -22,6 +22,7 @@ export class ShowProfileComponent extends SubscriptionCleanup implements OnInit,
   public readonly currentUser$: Observable<SessionUser | null | undefined> = this.userService.currentUser$;
   public isCurrentUserProfile$!: Observable<boolean>;
   public isFollowing$!: Observable<boolean>;
+  public isRequested$!: Observable<boolean>;
   public profile: Profile | undefined;
   public profilePictureUrl: string | undefined;
   public posts: ProfilePost[] = [];
@@ -59,8 +60,7 @@ export class ShowProfileComponent extends SubscriptionCleanup implements OnInit,
         // Verificăm dacă profilul este profilul utilizatorului curent
         this.isCurrentUserProfile$ = this.isCurrentUser(userId);
 
-        // Verificăm dacă utilizatorul curent urmărește profilul
-        this.isFollowing$ = this.isFollowing(userId);
+        this.isFollowing(userId);
       });
   }
 
@@ -115,27 +115,39 @@ export class ShowProfileComponent extends SubscriptionCleanup implements OnInit,
     );
   }
 
-  private isFollowing(userId: string): Observable<boolean> {
-    return this.currentUser$.pipe(
-      switchMap((user) => {
-        if (user) {
-          const currentUserId = user.id;
-          return this.followerService.getFollowers(userId).pipe(
-            map((response) => {
-              const followerIds = response.content.map((follower) => follower.followedBy);
-              return followerIds.includes(currentUserId);
-            }),
-            catchError((error: any) => {
-              console.error(error);
-              return of(false);
-            })
-          );
-        } else {
-          return of(false);
-        }
-      })
-    );
+  private isFollowing(userId: string): void {
+    this.currentUser$
+      .pipe(
+        switchMap((user) => {
+          if (user) {
+            const currentUserId = user.id;
+            return this.followerService.getFollowers(userId).pipe(
+              map((response) => {
+                const followers = response.content;
+                const isFollowing = followers.some(follower => follower.followedBy === currentUserId && follower.accepted);
+                const isRequested = followers.some(follower => follower.followedBy === currentUserId && !follower.accepted);
+
+                this.isFollowing$ = of(isFollowing);
+                this.isRequested$ = of(isRequested);
+              }),
+              catchError((error: any) => {
+                console.error(error);
+                this.isFollowing$ = of(false);
+                this.isRequested$ = of(false);
+                return of(false);
+              })
+            );
+          } else {
+            this.isFollowing$ = of(false);
+            this.isRequested$ = of(false);
+            return of(false);
+          }
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe();
   }
+
 
   public follow() {
     if (!this.profile) {
@@ -145,7 +157,11 @@ export class ShowProfileComponent extends SubscriptionCleanup implements OnInit,
       .follow(this.profile.userId)
       .pipe(takeUntil(this.destroy$))
       .subscribe((response) => {
-        this.isFollowing$ = of(true);
+        if (response.content.accepted) {
+          this.isFollowing$ = of(true);
+        } else {
+          this.isRequested$ = of(true);
+        }
       });
   }
 
@@ -158,6 +174,7 @@ export class ShowProfileComponent extends SubscriptionCleanup implements OnInit,
       .pipe(takeUntil(this.destroy$))
       .subscribe((response) => {
         this.isFollowing$ = of(false);
+        this.isRequested$ = of(false);
       });
   }
 

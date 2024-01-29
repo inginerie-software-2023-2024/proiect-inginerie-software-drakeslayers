@@ -1,5 +1,5 @@
 <div [ngSwitch]="notification.type" class="notification-container">
-  <ng-container *ngSwitchCase="notificationType.FollowRequest">
+  <ng-container *ngSwitchCase="notificationType.NewFollower">
     <mds-profile-pic
       [pictureSrc]="profile.profilePictureURL"
       class="profile-pic"
@@ -13,6 +13,22 @@
       <div class="date">{{ dateFormatted }}</div>
     </div>
   </ng-container>
+  <ng-container *ngSwitchCase="notificationType.FollowRequest">
+    <mds-profile-pic
+      [pictureSrc]="profile.profilePictureURL"
+      class="profile-pic"
+      [userId]="notification.userId"
+    ></mds-profile-pic>
+    <div class="content">
+      <span>
+        <mds-username [username]="profile.username" [userId]="notification.userId"></mds-username>
+        sent you a follow request.
+        <button mat-button class="mat-primary" (click)="acceptFollowRequest(notification)">Accept</button>
+      </span>
+      <div class="date">{{ dateFormatted }}</div>
+    </div>
+  </ng-container>
+
   <ng-container *ngSwitchCase="notificationType.PostLike">
     <mds-profile-pic
       [pictureSrc]="profile.profilePictureURL"
