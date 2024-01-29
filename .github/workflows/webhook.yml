@@ -42,7 +42,8 @@ jobs:
           - 6379:6379
 
     strategy:
-      node-version: [ 18.x ]
+      matrix:
+        node-version: [ 16.x, 18.x ]
 
 
     steps:
