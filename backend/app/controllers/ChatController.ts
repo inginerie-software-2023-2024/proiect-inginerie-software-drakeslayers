@@ -68,7 +68,7 @@ export class ChatController {
                 }
 
                 memberIds.push(...filteredMembers);
-                return chatService.createChat(chat, memberIds)
+                return chatService.createChat(chat, memberIds, req.session.user!.id)
                 .then(() => res.status(200).json({ error: undefined, content: chat }));
             })
             .catch(err => {

@@ -79,7 +79,6 @@ export class FollowersController {
                         followedBy: req.session.user!.id,
                         accepted: !isProfilePrivate,
                     }
-                    console.log(newFollower);
                     
                     knexInstance('Followers')
                         .insert(newFollower)
