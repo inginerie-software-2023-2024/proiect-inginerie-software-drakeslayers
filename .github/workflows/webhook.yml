@@ -53,6 +53,8 @@ jobs:
 
       - name: Setup DB
         run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends postgresql-client
           psql -U runner -d dbMDS -a -f sql/users.sql 
 
       - name: Install dependencies Python
