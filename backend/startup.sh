@@ -36,5 +36,4 @@ docker start $POSTGRES > /dev/null;
 
 echo "Running node server...";
 
-npm run dev > /dev/null 2>&1 >> $NODELOG
-
+(nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"

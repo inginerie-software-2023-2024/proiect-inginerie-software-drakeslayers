@@ -63,12 +63,6 @@ jobs:
       - name: Setup DB
         run: |
           node sql/client.js
-        env:
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: brontosaur
-          POSTGRES_PASSWORD: 1234
-          POSTGRES_DB_NAME: dbMDS
 
       - name: Start server Python
         working-directory: backend-python
