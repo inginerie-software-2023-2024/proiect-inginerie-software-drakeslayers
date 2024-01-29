@@ -21,7 +21,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_DB: dbMDS
-          POSTGRES_USER: brontosaur
+          POSTGRES_USER: runner
           POSTGRES_PASSWORD: 1234
         options: >-
           --health-cmd pg_isready
@@ -53,7 +53,7 @@ jobs:
 
       - name: Setup DB
         run: |
-          psql -U brontosaur -d dbMDS -a -f sql/dbMDS.sql 
+          psql -U runner -d dbMDS -a -f sql/users.sql 
 
       - name: Install dependencies Python
         working-directory: backend-python
