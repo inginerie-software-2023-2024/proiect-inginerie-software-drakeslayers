@@ -41,6 +41,10 @@ jobs:
         ports:
           - 6379:6379
 
+    strategy:
+      node-version: [ 18.x ]
+
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -49,7 +53,9 @@ jobs:
         run: npm ci --omit=dev
 
       - name: Start server
-        run: sudo npm run dev
+        run: |
+          yarn
+          sudo npm run dev
 
       - name: Run Tests
         run: npx ts-mocha -p tsconfig.json test/authentication.ts
