@@ -8,3 +8,9 @@ notificationRouter.get(
     authenticationController.isAuthenticated,
     notificationsController.getNotifications
 );
+
+notificationRouter.delete(
+    '/notifications/:notificationId',
+    authenticationController.isAuthenticated,
+    notificationsController.deleteNotification
+);

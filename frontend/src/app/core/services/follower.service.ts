@@ -26,6 +26,11 @@ export class FollowerService {
     return this.httpClient.post<GenericResponse<Follower>>(url, { follows: id });
   }
 
+  public acceptFollow(id: string) {
+    const url = 'api/followaccept';
+    return this.httpClient.post<GenericResponse<Follower>>(url, { follows: id });
+  }
+
   public unfollow(userId: string) {
     const url = 'api/follow/' + userId;
     return this.httpClient.delete<GenericResponse<Follower>>(url);

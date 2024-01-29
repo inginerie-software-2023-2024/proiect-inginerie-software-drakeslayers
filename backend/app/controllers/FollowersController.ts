@@ -30,6 +30,14 @@ function getAllFollowers(userId: string) {
         .where('follows', userId);
 }
 
+function isPrivateProfile(userId: string) {
+    return knexInstance('Profiles')
+        .select('isPrivate')
+        .where('userId', userId)
+        .first()
+        .then(result => result ? result.isPrivate : false);
+}
+
 export function isAcceptedFollower(userId: string, followedId: string){
     return knexInstance('Followers')
         .select('accepted')
@@ -57,7 +65,7 @@ export class FollowersController {
                 }
             })
             .then(() => getFollower(req.body.follows!, req.session.user!.id))
-            .then((follower: Follower) => {
+            .then(async (follower: Follower) => {
                 if (follower) {
                     let msg = follower.accepted ? "Already following!" : "Follow request already sent!";
                     throw {
@@ -65,11 +73,14 @@ export class FollowersController {
                         content: undefined,
                     }
                 } else {
+                    const isProfilePrivate = await isPrivateProfile(req.body.follows!);
                     let newFollower: Follower = {
                         follows: req.body.follows!,
                         followedBy: req.session.user!.id,
-                        accepted: false,
+                        accepted: !isProfilePrivate,
                     }
+                    console.log(newFollower);
+                    
                     knexInstance('Followers')
                         .insert(newFollower)
                         .then(arr => {
@@ -80,7 +91,6 @@ export class FollowersController {
                                 }
                             } else {
 								notificationsService.sendFollowRequestNotification(newFollower.followedBy, newFollower);
-
                                 return res.status(200).json({ error: undefined, content: newFollower });
                             }
                         })
@@ -99,7 +109,6 @@ export class FollowersController {
     }
 
     accept(req: Request<{}, {}, Partial<Follower>>, res: Response, next: NextFunction) {
-
         if (!req.body.follows) {
             const error = craftError(errorCodes.noContent, "User id cannot be null!");
             return res.status(403).json({ error, content: undefined });
