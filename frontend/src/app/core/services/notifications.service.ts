@@ -69,6 +69,12 @@ export class NotificationsService {
       this.newNotificationsSubject.next(newNotifications);
     });
 
+    socket.on('newFollowerNotification', (notification: NotificationWithData) => {
+      const newNotifications = this.newNotificationsSubject.value;
+      newNotifications.unshift(notification);
+      this.newNotificationsSubject.next(newNotifications);
+    });
+
     socket.on('postLikeNotification', (notification: NotificationWithData) => {
       const newNotifications = this.newNotificationsSubject.value;
       newNotifications.unshift(notification);
@@ -122,4 +128,12 @@ export class NotificationsService {
     const url = 'api/notifications';
     return this.httpClient.get<GenericResponse<NotificationWithData[]>>(url);
   }
+
+  public removeNotification(notificationId: string): void {
+    const currentNotifications = this.newNotificationsSubject.value;
+    const updatedNotifications = currentNotifications.filter(notification => notification.notification.id !== notificationId);
+    this.newNotificationsSubject.next(updatedNotifications);
+    this.httpClient.delete(`api/notifications/${notificationId}`, { withCredentials: true }).subscribe(/* gestionează răspunsul */);
+  }
+
 }

@@ -54,4 +54,31 @@ export class NotificationsController {
                 return res.status(500).json({ error, content: undefined });
             });
     }
+
+    deleteNotification(req: Request, res: Response, next: NextFunction) {
+        const userId = req.session.user?.id!;
+        const notificationId = req.params.notificationId;
+    
+        knexInstance.transaction(async (trx) => {
+          try {
+            await trx('NotificationRecipients')
+              .where({ userId, notificationId })
+              .del();
+    
+            const deletedNotification = await trx('Notifications')
+              .where('id', notificationId)
+              .first();
+    
+            if (!deletedNotification) {
+              return res.status(404).json({ error: craftError(errorCodes.notFound, 'Notification not found'), content: undefined });
+            }
+    
+            res.json({ error: undefined, content: { notification: deletedNotification } });
+          } catch (error) {
+            await trx.rollback();
+            const errorMessage = craftError(errorCodes.other, 'Failed to delete notification. Please try again!');
+            return res.status(500).json({ error: errorMessage, content: undefined });
+          }
+        });
+      }
 }

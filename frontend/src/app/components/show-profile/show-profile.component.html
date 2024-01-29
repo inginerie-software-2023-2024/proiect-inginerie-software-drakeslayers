@@ -10,10 +10,10 @@
           <div class="username-container">
             <h2 class="username">{{ profile.username }}</h2>
             <button routerLink="/edit-profile" routerLinkActive="active" mat-raised-button *ngIf="(isCurrentUserProfile$ | async)" mat-stroked-button class="edit-profile-button">Edit profile</button>
-            <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && !(isFollowing$ | async)" mat-stroked-button class="follow-button" (click)="follow()"> Follow </button>
+            <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && !(isFollowing$ | async) && !(isRequested$ | async)" mat-stroked-button class="follow-button" (click)="follow()"> Follow </button>
+            <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && (isRequested$ | async)" mat-stroked-button class="follow-button" (click)="unfollow()"> Cancel request </button>
             <button mat-raised-button *ngIf="!(isCurrentUserProfile$ | async) && (isFollowing$ | async)" mat-stroked-button class="follow-button" (click)="unfollow()"> Unfollow </button>
           </div>
-
           <div class="follow-info">
             <mds-followers [userId]="profile.userId"></mds-followers>
           </div>

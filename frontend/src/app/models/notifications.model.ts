@@ -3,11 +3,12 @@ import { Post } from './post.model';
 import { Profile } from './profile.model';
 
 export enum NotificationType {
-  FollowRequest = 'FollowRequest',
-  PostLike = 'PostLike',
-  CommentLike = 'CommentLike',
-  NewComment = 'NewComment',
-  NewReply = 'NewReply'
+FollowRequest='FollowRequest',
+NewFollower='NewFollower',
+PostLike='PostLike',
+CommentLike="CommentLike",
+NewComment="NewComment",
+NewReply="NewReply",
 }
 
 export interface Notification {
@@ -24,6 +25,10 @@ export interface NotificationWithData {
 }
 
 export interface FollowRequestNotification extends Notification {
+  content: Follower;
+}
+
+export interface NewFollowerNotification extends Notification {
   content: Follower;
 }
 

@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import { isPrivate } from './ProfileController';
 import { isAcceptedFollower } from './FollowersController';
+import axios from 'axios';
 
 
 export function getPostsByUser(userId: string) : Promise<Post[]> {
@@ -61,19 +62,25 @@ async function getHashtags(description: string): Promise<string[]> {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Ignore SSL errors (not recommended for production)
     let link_to_server: string = "https://localhost:8080"; // TODO: change this to the server's link
     let route: string = link_to_server + "/extract_hashtags";
-    const response = await fetch(route, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ description: description }),
-    });
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data['hashtags'];
+    return axios
+        .post(route, 
+        {
+            description: description
+        }, 
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.data) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        
+            const data = response.data;
+            return data['hashtags'];
+        });
 }
 
 export class PostController {
