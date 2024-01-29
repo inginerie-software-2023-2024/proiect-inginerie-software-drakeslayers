@@ -49,7 +49,7 @@ class ChatService {
                     members.forEach(m => {
                         const socket = this.socketsService.getSocket(m);
                         if (!!socket){
-                            socket.emit('newChatMessage', { chatMessage }, () => knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId: m, chatId}));
+                            socket.emit('newChatMessage', message, () => knexInstance('ChatUsers').update({ lastRead: new Date()}).where({userId: m, chatId}));
                         }
                     })
                })

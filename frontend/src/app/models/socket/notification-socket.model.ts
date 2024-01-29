@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io-client';
 import { NotificationWithData } from '../notifications.model';
 
-export interface ServerToClientEvents {
+interface ServerToClientEvents {
   any: (...args: any[]) => void;
   followRequestNotification: (content: NotificationWithData) => void;
   newFollowerNotification: (content: NotificationWithData) => void;
@@ -11,8 +11,8 @@ export interface ServerToClientEvents {
   newReplyNotification: (content: NotificationWithData) => void;
 }
 
-export interface ClientToServerEvents {
+interface ClientToServerEvents {
   any: (...args: any[]) => void;
 }
 
-export interface ClientSocket extends Socket<ServerToClientEvents, ClientToServerEvents> {}
+export interface NotificationSocket extends Socket<ServerToClientEvents, ClientToServerEvents> {}

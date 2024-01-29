@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ClientSocket } from 'app/models/socket/socket.model';
+import { NotificationSocket } from 'app/models/socket/notification-socket.model';
 import { UserService } from './user.service';
 import { NotificationWithData } from 'app/models/notifications.model';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -28,8 +28,8 @@ export class NotificationsService {
     this.createConnection();
   }
 
-  private createConnection(userId: string | undefined = undefined): ClientSocket {
-    const socketAuth: SocketAuth = { userId, socketType: SocketTypeEnum.notifications };
+  private createConnection(userId: string | undefined = undefined): NotificationSocket {
+    const socketAuth: SocketAuth = { userId, socketType: SOCKET_TYPE };
 
     return this.socketService.add(SOCKET_ID, false, socketAuth);
   }
@@ -42,7 +42,7 @@ export class NotificationsService {
     this.socketService.disconnect(SOCKET_ID);
   }
 
-  private getSocket(): ClientSocket | undefined {
+  private getSocket(): NotificationSocket | undefined {
     return this.socketService.get(SOCKET_ID);
   }
 
