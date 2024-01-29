@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import { isPrivate } from './ProfileController';
 import { isAcceptedFollower } from './FollowersController';
+import { isAdmin } from '../services/users-service';
 
 
 export function getPostsByUser(userId: string) : Promise<Post[]> {
@@ -260,47 +261,64 @@ export class PostController {
         getPostOwner(req.params.id)
             .then(async (data: Partial<Post> | undefined) => {
                 if (!data) {
-                    const error = craftError(errorCodes.notFound, "Post not found!");
-                    return res.status(404).json({ error, content: undefined });
+                    throw {
+                        error: craftError(errorCodes.notFound, "Post not found!"),
+                        content: undefined,
+                        status: 404, 
+                    }
                 }
 
-                if (data.userId !== req.session.user!.id) {
-                    const error = craftError(errorCodes.unAuthorized, "You are not authorized!");
-                    return res.status(403).json({ error, content: undefined });
-                }
-                const post: Partial<Post> = {
-                    description: req.body.description,
-                }
-
-                const query = knexInstance('Posts')
-                    .where('id', req.params.id)
-                    .andWhere('userId', req.session.user!.id);
-
-                if (post.description) {
-                    const hashtags = await getHashtags(post.description);
-                    query.update({ description: post.description, hashtags: hashtags }, "*");
-                }
-
-                query
-                    .then(arr => {
-                        if (arr.length === 0) {
-                            const error = craftError(errorCodes.notFound, "Post not found!");
-                            return res.status(404).json({ error, content: undefined });
+                return isAdmin(req.session.user!.id)
+                .then((admin: boolean) => {
+                    if (!admin && data.userId !== req.session.user!.id) {
+                        throw {
+                            error: craftError(errorCodes.unAuthorized, "You are not authorized!"),
+                            content: undefined,
+                            status: 403, 
                         }
-
-                        const metadataPost = getPostMetaData(arr[0]);
-                        return res.status(200).json({ error: undefined, content: metadataPost });
-                    })
-                    .catch(err => {
-                        console.error(err.message);
-                        const error = craftError(errorCodes.other, "Please try again!");
-                        return res.status(500).json({ error, content: undefined });
-                    });
+                    }
+    
+                })
+                .then(async () => {
+                    const post: Partial<Post> = {
+                        description: req.body.description,
+                    }
+    
+                    const query = knexInstance('Posts')
+                        .where('id', req.params.id)
+                        .andWhere('userId', req.session.user!.id);
+    
+                    if (post.description) {
+                        const hashtags = await getHashtags(post.description);
+                        query.update({ description: post.description, hashtags: hashtags }, "*");
+                    }
+    
+                    query
+                        .then(arr => {
+                            if (arr.length === 0) {
+                                const error = craftError(errorCodes.notFound, "Post not found!");
+                                return res.status(404).json({ error, content: undefined });
+                            }
+    
+                            const metadataPost = getPostMetaData(arr[0]);
+                            return res.status(200).json({ error: undefined, content: metadataPost });
+                        })
+                        .catch(err => {
+                            console.error(err.message);
+                            const error = craftError(errorCodes.other, "Please try again!");
+                            return res.status(500).json({ error, content: undefined });
+                        });
+                })
             })
             .catch(err => {
-                console.error(err.message);
-                const error = craftError(errorCodes.other, "Please try again!");
-                return res.status(500).json({ error, content: undefined });
+                if (!err.error) {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try again!");
+                    return res.status(500).json({ error, content: undefined });
+                } else {
+                    console.error(err.error.errorMsg);
+                    return res.status(err.status).json(err);
+                }
             });
     }
 }

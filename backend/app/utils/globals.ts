@@ -41,6 +41,7 @@ export interface User {
     id: string,
     email: string,
     passwordHash: string,
+    isAdmin: boolean,
 }
 
 export interface Profile {
@@ -61,6 +62,7 @@ declare module 'express-session' {
             id: string,
             username: string,
             email: string,
+            isAdmin: boolean,
         };
     }
 }
