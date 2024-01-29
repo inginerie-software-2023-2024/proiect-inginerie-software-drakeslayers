@@ -59,16 +59,16 @@ export class ChatController {
 
         const memberIds: String[] = [req.session.user!.id];
 
-        if (req.body.members){
-            return filterPrivateMembers(req.session.user!.id, req.body.members)
+        if (req.body.memberIds){
+            return filterPrivateMembers(req.session.user!.id, req.body.memberIds)
             .then(filteredMembers => {
-                if (filteredMembers.length !== req.body.members.length){
+                if (filteredMembers.length !== req.body.memberIds.length){
                     const error = craftError(errorCodes.privateProfile, "Some members have private profiles!");
                     return res.status(403).json({ error, content: undefined });
                 }
 
                 memberIds.push(...filteredMembers);
-                return chatService.createChat(chat, memberIds)
+                return chatService.createChat(chat, memberIds, req.session.user!.id)
                 .then(() => res.status(200).json({ error: undefined, content: chat }));
             })
             .catch(err => {
@@ -144,6 +144,7 @@ export class ChatController {
         }
 
         return chatService.getChatsByUserId(userId)
+            .then(chats => chats.filter(x => x))
             .then(chats => res.status(200).json({ error: undefined, content: chats }))
             .catch(err => {
                 console.error(err.message);
