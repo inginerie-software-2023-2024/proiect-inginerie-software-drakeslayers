@@ -26,6 +26,7 @@ export class AuthenticationController {
                                         id: user.id,
                                         username: "username",
                                         email: user.email,
+                                        isAdmin: false,
                                     };
                                     req.session.regenerate(function (err) {
                                         if (err) {
@@ -83,7 +84,8 @@ export class AuthenticationController {
                             return {
                                 id: x.id,
                                 email: x.email,
-                                username: "username"
+                                username: "username",
+                                isAdmin: x.isAdmin,
                             }
                         })
                         .then(sessionUser => {

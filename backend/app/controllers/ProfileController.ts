@@ -4,6 +4,7 @@ import { craftError, errorCodes } from '../utils/error';
 import { File, Post, craftPictureDest, deleteFiles, moveFiles, zipDirectory } from '../utils/globals';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { isAdmin } from '../services/users-service';
 
 const defaultProfilePictureURL = "defaultImage.png";
 
@@ -190,6 +191,27 @@ export class ProfileController {
 
         getProfileByUserId(userId) 
             .then(profile => {
+                if (!profile) {
+                    throw {
+                        error: craftError(errorCodes.notFound, "Profile not found!"),
+                        content: undefined,
+                        status: 404, 
+                    }
+                }
+
+                return isAdmin(userId!)
+                .then((admin: boolean) => {
+                    if (!admin && profile.userId !== req.session.user!.id) {
+                        throw {
+                            error: craftError(errorCodes.unAuthorized, "You are not authorized!"),
+                            content: undefined,
+                            status: 403, 
+                        }
+                    }
+                    return profile;
+                });
+            })
+            .then(profile => {
                 const updatedProfile: Partial<Profile> = {};
                 
                 if (req.body.username) {
@@ -239,18 +261,18 @@ export class ProfileController {
                         }
 
                         return res.status(200).json({ error: undefined, content: arr[0] });
-                    })
-                    .catch(err => {
-                        console.error(err.message);
-                        const error = craftError(errorCodes.other, "Please try again!");
-                        return res.status(500).json({ error, content: undefined });
-                    })
+                    });
                 
             })
             .catch(err => {
-                console.error(err.message);
-                const error = craftError(errorCodes.other, "Please try again!");
-                return res.status(500).json({ error, content: undefined });
+                if (!err.error) {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try again!");
+                    return res.status(500).json({ error, content: undefined });
+                } else {
+                    console.error(err.error.errorMsg);
+                    return res.status(err.status).json(err);
+                }
             })
     }
 
@@ -259,6 +281,27 @@ export class ProfileController {
 
         // Find profile in the database
         getProfileByUserId(userId)
+            .then(profile => {
+                if (!profile) {
+                    throw {
+                        error: craftError(errorCodes.notFound, "Profile not found!"),
+                        content: undefined,
+                        status: 404, 
+                    }
+                }
+
+                return isAdmin(userId!)
+                .then((admin: boolean) => {
+                    if (!admin && profile.userId !== req.session.user!.id) {
+                        throw {
+                            error: craftError(errorCodes.unAuthorized, "You are not authorized!"),
+                            content: undefined,
+                            status: 403, 
+                        }
+                    }
+                    return profile;
+                });
+            })
             .then(profile => {
                 if (!profile) {
                     const error = craftError(errorCodes.notFound, "Profile not found!");
@@ -284,17 +327,17 @@ export class ProfileController {
                                 return res.status(200).json({ error: undefined, content: undefined });
                             })
                         }     
-                    })
-                    .catch(err => {
-                        console.error(err.message);
-                        const error = craftError(errorCodes.other, "Please try deleting again!");
-                        return res.status(500).json({ error, content: undefined });
-                    })
+                    });
             })
             .catch(err => {
-                console.error(err.message);
-                const error = craftError(errorCodes.other, "Please try deleting again!");
-                return res.status(500).json({ error, content: undefined });
+                if (!err.error) {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try again!");
+                    return res.status(500).json({ error, content: undefined });
+                } else {
+                    console.error(err.error.errorMsg);
+                    return res.status(err.status).json(err);
+                }
             })
     }
 
@@ -302,6 +345,27 @@ export class ProfileController {
         const userId = req.session.user!.id;
 
         getProfileByUserId(userId)
+            .then(profile => {
+                if (!profile) {
+                    throw {
+                        error: craftError(errorCodes.notFound, "Profile not found!"),
+                        content: undefined,
+                        status: 404, 
+                    }
+                }
+
+                return isAdmin(userId!)
+                .then((admin: boolean) => {
+                    if (!admin && profile.userId !== req.session.user!.id) {
+                        throw {
+                            error: craftError(errorCodes.unAuthorized, "You are not authorized!"),
+                            content: undefined,
+                            status: 403, 
+                        }
+                    }
+                    return profile;
+                });
+            })
             .then(profile => {
                 if (!profile) {
                     const error = craftError(errorCodes.notFound, "Profile not found!");
@@ -337,5 +401,15 @@ export class ProfileController {
                 else
                     return res.status(200).json({ error: undefined, content: "No profile picture found to delete" });     
             })
+            .catch(err => {
+                if (!err.error) {
+                    console.error(err.message);
+                    const error = craftError(errorCodes.other, "Please try again!");
+                    return res.status(500).json({ error, content: undefined });
+                } else {
+                    console.error(err.error.errorMsg);
+                    return res.status(err.status).json(err);
+                }
+            });
     }    
 }

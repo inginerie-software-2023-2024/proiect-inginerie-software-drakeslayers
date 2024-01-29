@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public."Users"
     id text COLLATE pg_catalog."default" NOT NULL,
     email text COLLATE pg_catalog."default" NOT NULL,
     "passwordHash" text COLLATE pg_catalog."default" NOT NULL,
+    "isAdmin" boolean NOT NULL DEFAULT false,
     CONSTRAINT "User_pkey" PRIMARY KEY (id)
 )
 
