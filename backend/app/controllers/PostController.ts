@@ -103,8 +103,8 @@ export class PostController {
         let userId = req.session.user!.id;
         let description = req.body.description;
 
-        // const hashtags = await getHashtags(description);
-        const hashtags = ['New Post'];
+        const hashtags = await getHashtags(description);
+        // const hashtags = ['New Post'];
 
         let post = {
             id,
