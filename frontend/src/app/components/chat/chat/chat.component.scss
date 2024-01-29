@@ -43,8 +43,9 @@
 
 .messages-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse; // this is used for pinning scroll to bottom
   padding: 16px;
+  overflow: auto;
 }
 
 .message-container {

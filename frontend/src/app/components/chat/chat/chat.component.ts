@@ -27,8 +27,10 @@ export class ChatComponent {
       };
 
       return [beginningMessage, ...messages];
-    })
+    }),
+    map((messages) => messages.reverse())
   );
+
   public readonly currentUser$ = this.userService.currentUser$;
 
   public message: string = '';

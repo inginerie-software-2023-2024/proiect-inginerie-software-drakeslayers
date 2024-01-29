@@ -7,6 +7,7 @@ import { UserService } from './user.service';
 import _ from 'lodash';
 import { ChatWithMessages } from 'app/models/chat/chat-with-messages.model';
 import { ChatMessage } from 'app/models/chat/chat-message.model';
+import { RealtimeMessage } from 'app/models/chat/realtime-message.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,8 +21,8 @@ export class MyChatsService {
       map((chats) =>
         chats.sort(
           (a, b) =>
-            new Date(b.messages.slice(-1)[0]?.sentAt || b.lastRead).getTime() -
-            new Date(a.messages.slice(-1)[0]?.sentAt || a.lastRead).getTime()
+            new Date(b.messages.slice(-1)[0]?.sentAt || b.chat.createdAt).getTime() -
+            new Date(a.messages.slice(-1)[0]?.sentAt || a.chat.createdAt).getTime()
         )
       )
     );
@@ -81,18 +82,45 @@ export class MyChatsService {
     );
   }
 
+  private updateChat(chatId: string, updateFn: (chat: ChatWithMessages) => void): ChatWithMessages | undefined {
+    const chats = this.myChatsSubject.getValue();
+    const chatIndex = _.findIndex(chats, (chat) => chat.chat.id === chatId);
+    if (chatIndex !== -1) {
+      const chat = chats[chatIndex];
+      updateFn(chat);
+      chats[chatIndex] = chat;
+      this.myChatsSubject.next(chats);
+      return chat;
+    }
+    return undefined;
+  }
+
   public sendMessage(chatId: string, message: string): Observable<ChatMessage> {
     return this.chatService.sendMessage(chatId, message).pipe(
       map((res) => res.content),
-      tap((message) => {
-        const chats = this.myChatsSubject.getValue();
-        const chatIndex = _.findIndex(chats, (chat) => chat.chat.id === chatId);
-        if (chatIndex !== -1) {
-          const chat = chats[chatIndex];
-          chat.messages.push(message);
-          chats[chatIndex] = chat;
-          this.myChatsSubject.next(chats);
-        }
+      tap((message) =>
+        this.updateChat(chatId, (chat) => {
+          if (!chat.messages.find((m) => m.id === message.id)) {
+            chat.messages.push(message);
+          }
+        })
+      )
+    );
+  }
+
+  public addRealTimeMessage(message: RealtimeMessage): void {
+    this.updateChat(message.chatId, (chat) => {
+      if (!chat.messages.find((m) => m.id === message.id)) {
+        chat.messages.push(message);
+      }
+    });
+  }
+
+  public readMessages(chatId: string): Observable<undefined> {
+    return this.chatService.readMessages(chatId).pipe(
+      map((res) => res.content),
+      tap(() => {
+        this.updateChat(chatId, (chat) => (chat.lastRead = new Date().toISOString()));
       })
     );
   }

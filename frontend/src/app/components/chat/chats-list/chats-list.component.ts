@@ -52,7 +52,7 @@ export class ChatsListComponent extends SubscriptionCleanup {
     this.activeChatId = chatId;
     // Mark messages as read
     this.chatService.readMessages(chatId).subscribe();
-    this.activeChatService.selectChat(this.chatsWithMessages.find((chat) => chat.chat.id === chatId)!);
+    this.activeChatService.selectChat(chatId);
   }
 
   @HostListener('document:keydown.escape')
