@@ -56,7 +56,8 @@ jobs:
       - name: Start server
         run: |
           yarn
-          sudo npm run dev
+          npm run build
+          (nohup node tsOutput/app/app.js 0<&- &>/dev/null &) && echo "Done!"
 
       - name: Run Tests
         run: npx ts-mocha -p tsconfig.json test/authentication.ts
