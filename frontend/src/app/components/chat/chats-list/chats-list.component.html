@@ -20,7 +20,7 @@
         <div class="name-and-date">
           <p class="chat-name">{{ obj.chat.name }}</p>
           <p class="chat-date">
-            {{ (obj.messages.length > 0 ? obj.messages.slice(-1)[0].sentAt : obj.lastRead) | timestampToHour }}
+            {{ (obj.messages.length > 0 ? obj.messages.slice(-1)[0].sentAt : obj.lastRead) | timestampToWhatsapp }}
           </p>
         </div>
         <p class="chat-last-message">

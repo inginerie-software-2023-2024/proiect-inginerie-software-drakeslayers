@@ -10,6 +10,7 @@ import { ApiPrefixPipe } from './pipes/api-prefix.pipe';
 import { PostLinkPipe } from './pipes/post-link.pipe';
 import { TimestampToHourPipe } from './pipes/timestamp-to-hour.pipe';
 import { TimestampToDatePipe } from './pipes/timestamp-to-date.pipe';
+import { TimestampToWhatsappPipe } from './pipes/timestamp-to-whatsapp.pipe';
 
 const PIPES = [
   FormControlErrorMessagePipe,
@@ -17,7 +18,8 @@ const PIPES = [
   PostLinkPipe,
   ApiPrefixPipe,
   TimestampToHourPipe,
-  TimestampToDatePipe
+  TimestampToDatePipe,
+  TimestampToWhatsappPipe
 ];
 
 @NgModule({
