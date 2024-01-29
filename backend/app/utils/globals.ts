@@ -18,6 +18,7 @@ import { FeedController } from '../controllers/FeedController';
 import { NotificationsController } from '../controllers/NotificationsController';
 import { ChatController } from '../controllers/ChatController';
 
+
 // database connection
 const knexConfig: Knex.Config = {
     client: 'postgres',
@@ -49,6 +50,8 @@ export interface Profile {
     name: string,
     profilePictureURL: string,
     bio?: string,
+    isPrivate: boolean,
+    hashtags?: string[],
 }
 
 // user information to be used on client
@@ -79,6 +82,7 @@ export interface Post {
     userId: string,
     description?: string,
     picturesURLs: string[],
+    hashtags: string[],
 }
 
 export interface PostLike {
@@ -328,7 +332,6 @@ export function uploadMediaChatPicture(req: Request, res: Response, next: NextFu
 
 // middleware to verify if a profile exists
 export function ProfileExists(req: Request, res: Response, next: NextFunction) {
-    console.log("sunt in profile exists");
     const userId = req.session.user!.id;
     getProfileByUserId(userId)
       .then((profile) => {
@@ -349,8 +352,6 @@ export function ProfileExists(req: Request, res: Response, next: NextFunction) {
 
 // middleware to verify if a profile does not exists
 export function ProfileDoesNotExist(req: Request, res: Response, next: NextFunction) {
-    console.log("sunt in profile does not exists");
-
     const userId = req.session.user!.id;
     getProfileByUserId(userId)
       .then((profile) => {

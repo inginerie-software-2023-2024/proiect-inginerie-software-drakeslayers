@@ -14,6 +14,7 @@ function getProfileMetaData(profile: Profile): Partial<Profile> {
         username: profile.username,
         name: profile.name,
         bio: profile.bio,
+        isPrivate: profile.isPrivate,
     };
 
     return profileMetaData;
@@ -34,7 +35,8 @@ export function getProfileByUserId(userId: string): Promise<Profile | undefined>
                 username: x[0].username,
                 name: x[0].name,
                 profilePictureURL: craftProfilePictureURL(userId, x[0].profilePictureURL),
-                bio: x[0].bio
+                bio: x[0].bio,
+                isPrivate: x[0].isPrivate,
             };
             return res;
         })
@@ -60,13 +62,22 @@ export function getProfilesInRange(userIdList: string[]): Promise<Profile[] | un
                 username: profile.username,
                 name: profile.name,
                 profilePictureURL: craftProfilePictureURL(profile.userId, profile.profilePictureURL),
-                bio: profile.bio
+                bio: profile.bio,
+                isPrivate: profile.isPrivate,
             }));
         })
         .catch(err => {
             console.error(err.message);
             return undefined;
         });
+}
+
+export function isPrivate(userId: string) : Promise<boolean> {
+    return knexInstance('Profiles')
+        .select('isPrivate')
+        .where({ userId })
+        .first()
+        .then(x => x ? x.isPrivate : false);
 }
 
 export class ProfileController {
@@ -95,13 +106,11 @@ export class ProfileController {
 
     getProfileRange(req: Request, res: Response, next: NextFunction) {
         const idList = req.body.usersIds;
-        console.log(idList);
         knexInstance
             .select('*')
             .from('Profiles')
             .whereIn('userId', idList)
             .then(arr => {
-                console.log(arr);
                 return res.status(200).json({ error: undefined, content: arr });
             })
             .catch(err => {
@@ -162,7 +171,9 @@ export class ProfileController {
             username: req.body.username,
             name: req.body.name,
             profilePictureURL: req.file === undefined ? defaultProfilePictureURL : req.file.filename,
-            bio: req.body.bio 
+            bio: req.body.bio,
+            isPrivate: req.body.isPrivate,
+            hashtags: [],
         }
 
         knexInstance('Profiles')
@@ -194,6 +205,10 @@ export class ProfileController {
 
                 if (req.body.bio !== undefined) {
                     updatedProfile.bio = req.body.bio;
+                }
+
+                if (req.body.isPrivate !== undefined){
+                    updatedProfile.isPrivate = req.body.isPrivate;
                 }
 
                 if (req.file) {

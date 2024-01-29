@@ -4,6 +4,8 @@ import { File, Post, craftPictureDest, deleteFiles, knexInstance, moveFiles, zip
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
+import { isPrivate } from './ProfileController';
+import { isAcceptedFollower } from './FollowersController';
 
 
 export function getPostsByUser(userId: string) : Promise<Post[]> {
@@ -55,9 +57,28 @@ function craftPictureURLs(picturesURLs: string[], userId: string): string[] {
     return picturesURLs.map((url) => path.join('users/', userId, 'pictures/', url));
 }
 
+async function getHashtags(description: string): Promise<string[]> {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Ignore SSL errors (not recommended for production)
+    let link_to_server: string = "https://localhost:8080"; // TODO: change this to the server's link
+    let route: string = link_to_server + "/extract_hashtags";
+    const response = await fetch(route, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ description: description }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data['hashtags'];
+}
+
 export class PostController {
 
-    create(req: Request, res: Response, next: NextFunction) {
+    async create(req: Request, res: Response, next: NextFunction) {
         if (!req.files) {
             const error = craftError(errorCodes.failedToUpload, "Please try uploading again!");
             return res.status(500).json({ error, content: undefined });
@@ -77,12 +98,15 @@ export class PostController {
         let userId = req.session.user!.id;
         let description = req.body.description;
 
+        const hashtags = await getHashtags(description);
+
         let post = {
             id,
             createdAt,
             userId,
             description,
             picturesURLs,
+            hashtags
         }
         knexInstance('Posts')
             .insert(post)
@@ -166,8 +190,26 @@ export class PostController {
 
     // metadata for all posts made by user
     getPostsByUser(req: Request, res: Response, next: NextFunction) {
+
         const userId = req.query['userid'] as string; 
-        getPostsByUser(userId!)
+        isPrivate(userId)
+        .then(res => {
+            if (!res)
+                return false;
+
+            const requestingUser = req.session?.user?.id;
+            if (!requestingUser)
+                return true;
+
+            return isAcceptedFollower(requestingUser, userId);
+        })
+        .then(cannotSee => {
+            if (cannotSee){
+                const error = craftError(errorCodes.privateProfile, "This profile is private!");
+                return res.status(403).json({ error, content: undefined });
+            }
+
+            getPostsByUser(userId!)
             .then(arr => {
                 if (arr.length === 0) {
                     const error = craftError(errorCodes.notFound, "No post found for this user!");
@@ -176,12 +218,13 @@ export class PostController {
 
                 return res.status(200).json({ error: undefined, content: arr });
 
-            })
-            .catch(err => {
-                console.error(err.message);
-                const error = craftError(errorCodes.other, "Please try again!");
-                return res.status(500).json({ error, content: undefined });
             });
+        })
+        .catch(err => {
+            console.error(err.message);
+            const error = craftError(errorCodes.other, "Please try again!");
+            return res.status(500).json({ error, content: undefined });
+        });
     }
 
     // sends urls to post media
@@ -215,7 +258,7 @@ export class PostController {
     patch(req: Request, res: Response, next: NextFunction) {
 
         getPostOwner(req.params.id)
-            .then((data: Partial<Post> | undefined) => {
+            .then(async (data: Partial<Post> | undefined) => {
                 if (!data) {
                     const error = craftError(errorCodes.notFound, "Post not found!");
                     return res.status(404).json({ error, content: undefined });
@@ -234,7 +277,8 @@ export class PostController {
                     .andWhere('userId', req.session.user!.id);
 
                 if (post.description) {
-                    query.update({ description: post.description }, "*");
+                    const hashtags = await getHashtags(post.description);
+                    query.update({ description: post.description, hashtags: hashtags }, "*");
                 }
 
                 query

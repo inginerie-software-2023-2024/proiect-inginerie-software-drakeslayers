@@ -49,7 +49,6 @@ class NotificationsService {
                             trx('NotificationRecipients')
                                 .insert(notificationRecipient)
                                 .then((arr) => {
-                                    console.log('arr 2', arr.length);
                                     if (arr.length === 0) {
                                         throw {
                                             error: craftError(errorCodes.other, 'Please try again!'),
@@ -102,7 +101,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -160,7 +158,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -217,7 +214,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
@@ -241,7 +237,6 @@ class NotificationsService {
     }
 
     public sendNewReplyNotification(comment: Comment, commentAuthorId: string): void {
-        console.log(commentAuthorId)
         if (comment.userId == commentAuthorId) {
             return;
         }
@@ -275,7 +270,6 @@ class NotificationsService {
                                 trx('NotificationRecipients')
                                     .insert(notificationRecipient)
                                     .then((arr) => {
-                                        console.log('arr 2', arr.length);
                                         if (arr.length === 0) {
                                             throw {
                                                 error: craftError(errorCodes.other, 'Please try again!'),
