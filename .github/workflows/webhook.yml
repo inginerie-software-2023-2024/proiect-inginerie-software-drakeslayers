@@ -51,6 +51,15 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      - name: Install dependencies Python
+        working-directory: backend-python
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install dependencies JS
+        run: |
+          npm ci --omit=dev
+
       - name: Setup DB
         run: |
           node sql/client.js
@@ -60,15 +69,6 @@ jobs:
           POSTGRES_USER: brontosaur
           POSTGRES_PASSWORD: 1234
           POSTGRES_DB_NAME: dbMDS
-
-      - name: Install dependencies Python
-        working-directory: backend-python
-        run: |
-          pip install -r requirements.txt
-
-      - name: Install dependencies JS
-        run: |
-          npm ci --omit=dev
 
       - name: Start server Python
         working-directory: backend-python
