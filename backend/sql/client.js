@@ -9,20 +9,34 @@ const client = new Client({
     port: 5432
 });
 
-const createTableUserQuery = fs.readFileSync('sql/users.sql', 'utf8');
-const createTableProfileQuery = fs.readFileSync('sql/profiles.sql', 'utf8');
-const createTablePotsQuery = fs.readFileSync('sql/posts.sql', 'utf8');
-const createTablePotLikesQuery = fs.readFileSync('sql/postLikes.sql', 'utf8');
-const createTableCommentsQuery = fs.readFileSync('sql/comments.sql', 'utf8');
-const createTableCommentLikesQuery = fs.readFileSync('sql/commentLikes.sql', 'utf8');
-const createTableFollowersQuery = fs.readFileSync('sql/followers.sql', 'utf8');
-const createTableNotificationTypeQuery = fs.readFileSync('sql/notification-type.sql', 'utf8');
-const createTableNotifications = fs.readFileSync('sql/notifications.sql', 'utf8');
-const createTableNotificationRecipientsQuery = fs.readFileSync('sql/notification-recipients.sql', 'utf8');
-const createTableChatsQuery = fs.readFileSync('sql/chats.sql', 'utf8');
-const createTableChatUsersQuery = fs.readFileSync('sql/chatUsers.sql', 'utf8');
-const createTableChatMessagesQuery = fs.readFileSync('sql/chatMessages.sql', 'utf8');
+const createTableUserQuery = fs.readFileSync('./users.sql', 'utf8');
+const createTableProfileQuery = fs.readFileSync('./profiles.sql', 'utf8');
+const createTablePotsQuery = fs.readFileSync('./posts.sql', 'utf8');
+const createTablePotLikesQuery = fs.readFileSync('./postLikes.sql', 'utf8');
+const createTableCommentsQuery = fs.readFileSync('./comments.sql', 'utf8');
+const createTableCommentLikesQuery = fs.readFileSync('./commentLikes.sql', 'utf8');
+const createTableFollowersQuery = fs.readFileSync('./followers.sql', 'utf8');
+const createTableNotificationTypeQuery = fs.readFileSync('./notification-type.sql', 'utf8');
+const createTableNotifications = fs.readFileSync('./notifications.sql', 'utf8');
+const createTableNotificationRecipientsQuery = fs.readFileSync('./notification-recipients.sql', 'utf8');
+const createTableChatsQuery = fs.readFileSync('./chats.sql', 'utf8');
+const createTableChatUsersQuery = fs.readFileSync('./chatUsers.sql', 'utf8');
+const createTableChatMessagesQuery = fs.readFileSync('./chatMessages.sql', 'utf8');
 
+
+// const createTableUserQuery = fs.readFileSync('users.sql', 'utf8');
+// const createTableProfileQuery = fs.readFileSync('profiles.sql', 'utf8');
+// const createTablePotsQuery = fs.readFileSync('posts.sql', 'utf8');
+// const createTablePotLikesQuery = fs.readFileSync('postLikes.sql', 'utf8');
+// const createTableCommentsQuery = fs.readFileSync('comments.sql', 'utf8');
+// const createTableCommentLikesQuery = fs.readFileSync('commentLikes.sql', 'utf8');
+// const createTableFollowersQuery = fs.readFileSync('followers.sql', 'utf8');
+// const createTableNotificationTypeQuery = fs.readFileSync('notification-type.sql', 'utf8');
+// const createTableNotifications = fs.readFileSync('notifications.sql', 'utf8');
+// const createTableNotificationRecipientsQuery = fs.readFileSync('notification-recipients.sql', 'utf8');
+// const createTableChatsQuery = fs.readFileSync('chats.sql', 'utf8');
+// const createTableChatUsersQuery = fs.readFileSync('chatUsers.sql', 'utf8');
+// const createTableChatMessagesQuery = fs.readFileSync('chatMessages.sql', 'utf8');
 
 client.connect()
     .then(() => {

@@ -21,7 +21,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_DB: dbMDS
-          POSTGRES_USER: runner
+          POSTGRES_USER: brontosaur
           POSTGRES_PASSWORD: 1234
         options: >-
           --health-cmd pg_isready
@@ -60,9 +60,13 @@ jobs:
         run: |
           npm ci --omit=dev
 
-#      - name: Setup DB
-#        run: |
-#          node sql/client.js
+      - name: Setup DB
+        run: |
+          node sql/client.js
+
+      - name: Test postgres
+        run: |
+          pg_isready -d dbMDS -h 127.0.0.1 -p 5432 -U brontosaur
 
 #      - name: Start server Python
 #        working-directory: backend-python
@@ -76,7 +80,6 @@ jobs:
 
       - name: Run Tests
         run: |
-          ls
           npx ts-mocha -p tsconfig.json test/authentication.ts
 
 
