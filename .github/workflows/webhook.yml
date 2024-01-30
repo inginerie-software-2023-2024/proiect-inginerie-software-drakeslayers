@@ -41,10 +41,10 @@ jobs:
         ports:
           - 6379:6379
 
-#    strategy:
-#      matrix:
-#        node-version: [ 16.x, 18.x ]
-#        python-version: [ 3.10 ]
+    strategy:
+      matrix:
+        node-version: [ 16.x, 18.x ]
+        python-version: [ 3.10 ]
 
 
     steps:
@@ -76,7 +76,9 @@ jobs:
       - name: Start server JS
         run: |
           yarn
-          (nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"
+          npm run build
+          (nohup node tsOutput/app/app.js 0<&- &>/dev/null &) && echo "Done!"
+#          (nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"
 
       - name: Run Tests
         run: |
