@@ -9,14 +9,14 @@
     <div>
       <mat-form-field class="login-form-field">
         <mat-label>Email</mat-label>
-        <input matInput placeholder="e.g. example@mail.com" type="email" formControlName="email" />
+        <input matInput placeholder="e.g. example@mail.com" type="email" formControlName="email" data-sel="email"/>
         <mat-error *ngIf="email.invalid">{{ email | formControlErrorMessage : email.errors }}</mat-error>
       </mat-form-field>
     </div>
     <div>
       <mat-form-field class="login-form-field">
         <mat-label>Password</mat-label>
-        <input matInput id="password" [type]="passwordVisible ? 'text' : 'password'" formControlName="password" />
+        <input matInput id="password" [type]="passwordVisible ? 'text' : 'password'" formControlName="password" data-sel="password"/>
         <mat-icon
           matSuffix
           [fontIcon]="passwordVisible ? 'visibility_off' : 'visibility'"
@@ -26,7 +26,7 @@
       </mat-form-field>
     </div>
 
-    <button mat-raised-button color="primary" type="submit" class="login-button">Login</button>
+    <button mat-raised-button color="primary" type="submit" class="login-button" data-sel="submitButton">Login</button>
 
     <p class="create-account">
       New here?
