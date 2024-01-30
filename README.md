@@ -41,7 +41,7 @@ For backend it is similar to MVC architecture, we have separated controllers, ro
 ### Application entry points:
 - Redis database for session management and Postgres database for all entities in the application
 - Pictures and text content provided by users
-Configuration files for github actions, typescript config files, package.json
+- Configuration files for github actions, typescript config files, package.json
 
 ## High level diagrams of the architecture  
 **Most valuable output** - the application itself, which is a web application that can be accessed from any browser. It is a social media application that allows users to create posts, upload pictures, leave comments, like content, get recommendations, chat, send follow requests. 
