@@ -20,7 +20,7 @@ const createTableNotificationTypeQuery = fs.readFileSync('sql/notification-type.
 const createTableNotifications = fs.readFileSync('sql/notifications.sql', 'utf8');
 const createTableNotificationRecipientsQuery = fs.readFileSync('sql/notification-recipients.sql', 'utf8');
 const createTableChatsQuery = fs.readFileSync('sql/chats.sql', 'utf8');
-const createTableChatUsersQuery = fs.readFileSync('sql/chatsUsers.sql', 'utf8');
+const createTableChatUsersQuery = fs.readFileSync('sql/chatUsers.sql', 'utf8');
 const createTableChatMessagesQuery = fs.readFileSync('sql/chatMessages.sql', 'utf8');
 
 
