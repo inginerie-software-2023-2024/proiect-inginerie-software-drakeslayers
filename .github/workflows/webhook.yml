@@ -51,10 +51,10 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-#      - name: Install dependencies Python
-#        working-directory: backend-python
-#        run: |
-#          pip install -r requirements.txt
+      - name: Install dependencies Python
+        working-directory: backend-python
+        run: |
+          pip install -r requirements.txt
 
       - name: Install dependencies JS
         run: |
@@ -68,10 +68,10 @@ jobs:
         run: |
           pg_isready -d dbMDS -h 127.0.0.1 -p 5432 -U brontosaur
 
-#      - name: Start server Python
-#        working-directory: backend-python
-#        run: |
-#          (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
+      - name: Start server Python
+        working-directory: backend-python
+        run: |
+          (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
 
       - name: Start server JS
         run: |
@@ -80,9 +80,21 @@ jobs:
           (nohup node tsOutput/app/app.js 0<&- &>/dev/null &) && echo "Done!"
 #          (nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"
 
-      - name: Run Tests
+      - name: Test Authentication
         run: |
           npx ts-mocha -p tsconfig.json test/authentication.ts
+
+      - name: Test Posts
+        run: |
+          npx ts-mocha -p tsconfig.json test/posts/posts.ts
+
+      - name: Test Comments
+        run: |
+          npx ts-mocha -p tsconfig.json test/comments/comments.ts
+
+      - name: Test Followers
+        run: |
+          npx ts-mocha -p tsconfig.json test/followers/followers.ts
 
 
 #  build-frontend:
