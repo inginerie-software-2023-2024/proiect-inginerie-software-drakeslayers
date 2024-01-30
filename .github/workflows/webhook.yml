@@ -71,6 +71,8 @@ jobs:
       - name: Start server Python
         working-directory: backend-python
         run: |
+          export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          export OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }}
           (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
 
       - name: Start server JS
