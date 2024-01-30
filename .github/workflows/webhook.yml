@@ -21,7 +21,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_DB: dbMDS
-          POSTGRES_USER: brontosaur
+          POSTGRES_USER: runner
           POSTGRES_PASSWORD: 1234
         options: >-
           --health-cmd pg_isready
@@ -71,7 +71,6 @@ jobs:
 
       - name: Start server JS
         run: |
-          ls
           yarn
           (nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"
 
