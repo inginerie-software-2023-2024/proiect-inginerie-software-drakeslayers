@@ -56,7 +56,7 @@ function followRequest(id: string): Promise<AxiosResponse> {
 }
 
 function acceptRequest(id: string): Promise<AxiosResponse> {
-    return axiosInstance.patch('https://localhost:8080/follow', { follows: id, accepted: true }, { headers: { cookie: myCookies } });
+    return axiosInstance.post('https://localhost:8080/followaccept', { follows: id, accepted: true }, { headers: { cookie: myCookies } });
 }
 
 function rejectRequest(id: string): Promise<AxiosResponse> {
