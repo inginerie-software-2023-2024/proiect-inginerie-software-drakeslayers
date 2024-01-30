@@ -11,6 +11,7 @@
           formControlName="description"
           placeholder="Enter description here..."
           rows="6"
+          data-sel="description"
         ></textarea>
         <mat-error *ngIf="description.invalid">
           {{ description | formControlErrorMessage : description.errors }}
@@ -40,11 +41,12 @@
       [message]="(uploadMessage$ | async) || 'Upload an image'"
       [disabled]="!(canUpload$ | async)"
       (file)="onImageUpload($event)"
+      data-sel="fileUpload"
     ></mds-file-upload>
 
     <div class="post-btn-container">
       Post this to your feed
-      <button mat-mini-fab type="submit" form="create-post-form" class="post-btn" color="primary" (click)="onSubmit()">
+      <button mat-mini-fab type="submit" form="create-post-form" class="post-btn" color="primary" (click)="onSubmit()" data-sel="submitButton">
         <mat-icon>arrow_forward</mat-icon>
       </button>
     </div>
