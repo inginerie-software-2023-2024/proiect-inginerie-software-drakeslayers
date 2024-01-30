@@ -3,8 +3,8 @@ import { axiosInstance, baseUrl, deleteUser, errorHandler, login, logout, myCook
 import { GenericResponse, Post, Comment, Follower } from "../../app/utils/globals";
 import { expect } from "chai";
 import { errorCodes } from "../../app/utils/error";
-import path from "path";
-import FormData from 'form-data';
+// import path from "path";
+// import FormData from 'form-data';
 import { createDummyPost, createdPost } from "../posts/postsSetup";
 
 let follow1: Partial<Follower>;
