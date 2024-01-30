@@ -10,33 +10,33 @@
       <mat-step label="Fill out your username" [stepControl]="username">
         <mat-form-field class="create-profile-form-field">
           <mat-label>Username</mat-label>
-          <input matInput formControlName="username" type="text" />
+          <input matInput formControlName="username" type="text" data-sel="username"/>
           <mat-error *ngIf="username.invalid">{{ username | formControlErrorMessage : username.errors }}</mat-error>
         </mat-form-field>
         <div>
-          <button mat-raised-button matStepperNext type="button">Next</button>
+          <button mat-raised-button matStepperNext type="button" data-sel="nextButton1">Next</button>
         </div>
       </mat-step>
       <mat-step label="Fill out your name" [stepControl]="name">
         <mat-form-field field class="create-profile-form-field">
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name" type="text" />
+          <input matInput formControlName="name" type="text" data-sel="name"/>
           <mat-error *ngIf="name.invalid">{{ name | formControlErrorMessage : name.errors }}</mat-error>
         </mat-form-field>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button mat-raised-button matStepperNext type="button">Next</button>
+          <button mat-raised-button matStepperNext type="button" data-sel="nextButton2">Next</button>
         </div>
       </mat-step>
       <mat-step label="Fill out your bio" [stepControl]="bio">
         <mat-form-field field class="create-profile-form-field">
           <mat-label>Bio</mat-label>
-          <textarea matInput formControlName="bio"></textarea>
+          <textarea matInput formControlName="bio" data-sel="bio"></textarea>
           <mat-error *ngIf="bio.invalid">{{ bio | formControlErrorMessage : bio.errors }}</mat-error>
         </mat-form-field>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button mat-raised-button matStepperNext type="button">Next</button>
+          <button mat-raised-button matStepperNext type="button" data-sel="nextButton3">Next</button>
         </div>
       </mat-step>
       <mat-step label="Choose a profile picture">
@@ -48,25 +48,25 @@
             <img [src]="selectedPhotoUrl" alt="Profile photo preview" />
             <p *ngIf="selectedPhotoName" class="photo-name">{{ selectedPhotoName }}</p>
           </div>
-          <input #fileInput type="file" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)" />
+          <input #fileInput type="file" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)" data-sel="profilePicture"/>
         </div>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button mat-raised-button matStepperNext type="button">Next</button>
+          <button mat-raised-button matStepperNext type="button" data-sel="nextButton4">Next</button>
         </div>
       </mat-step>
       <mat-step label="Set profile privacy" [stepControl]="isPrivate">
         <mat-form-field class="create-profile-form-field">
           <mat-label>Profile Privacy</mat-label>
-          <mat-select formControlName="isPrivate">
-            <mat-option value="false">Public</mat-option>
-            <mat-option value="true">Private</mat-option>
+          <mat-select formControlName="isPrivate" data-sel="privacy">
+            <mat-option value="false" data-sel="privacyFalse">Public</mat-option>
+            <mat-option value="true" data-sel="privacyTrue">Private</mat-option>
           </mat-select>
           <mat-error *ngIf="isPrivate.invalid">{{ isPrivate | formControlErrorMessage : isPrivate.errors }}</mat-error>
         </mat-form-field>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button mat-raised-button matStepperNext type="button">Next</button>
+          <button mat-raised-button matStepperNext type="button" data-sel="nextButton5">Next</button>
         </div>
       </mat-step>
 
@@ -75,7 +75,7 @@
         <ng-template matStepLabel>Done</ng-template>
         <p>You are now done.</p>
         <div>
-          <button mat-raised-button color="primary" type="submit" class="create-profile-button">Submit</button>
+          <button mat-raised-button color="primary" type="submit" class="create-profile-button" data-sel="submitButton">Submit</button>
           <button mat-button matStepperPrevious>Back</button>
           <button mat-button (click)="resetForm()">Reset</button>
         </div>
