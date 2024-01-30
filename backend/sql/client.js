@@ -28,19 +28,36 @@ client.connect()
     .then(() => {
         console.log('Connected to the PostgreSQL database');
 
-        client.query(createTableUserQuery, (err, res) => {
-            if (err) {
-                console.error('Error creating DB', err);
-            } else {
-                console.log('createTableUserQuery create successfully');
-            }
-        });
-
-        return client.end();
+        // Execute all queries sequentially
+        return Promise.all([
+            client.query(createTableUserQuery).then(() => console.log('createTableUserQuery created successfully')),
+            client.query(createTableProfileQuery).then(() => console.log('createTableProfileQuery created successfully')),
+            client.query(createTablePotsQuery).then(() => console.log('createTablePotsQuery created successfully')),
+            client.query(createTablePotLikesQuery).then(() => console.log('createTablePotLikesQuery created successfully')),
+            client.query(createTableCommentsQuery).then(() => console.log('createTableCommentsQuery created successfully')),
+            client.query(createTableCommentLikesQuery).then(() => console.log('createTableCommentLikesQuery created successfully')),
+            client.query(createTableFollowersQuery).then(() => console.log('createTableFollowersQuery created successfully')),
+            client.query(createTableNotificationTypeQuery).then(() => console.log('createTableNotificationTypeQuery created successfully')),
+            client.query(createTableNotifications).then(() => console.log('createTableNotifications created successfully')),
+            client.query(createTableNotificationRecipientsQuery).then(() => console.log('createTableNotificationRecipientsQuery created successfully')),
+            client.query(createTableChatsQuery).then(() => console.log('createTableChatsQuery created successfully')),
+            client.query(createTableChatUsersQuery).then(() => console.log('createTableChatUsersQuery created successfully')),
+            client.query(createTableChatMessagesQuery).then(() => console.log('createTableChatMessagesQuery created successfully'))
+        ]);
     })
     .then(() => {
-        console.log('Connection to PostgreSQL closed');
+        console.log('All queries executed successfully');
     })
     .catch(err => {
-        console.error('Error connecting to PostgreSQL database', err);
+        console.error('Error executing queries:', err);
+    })
+    .finally(() => {
+        // Close the connection
+        client.end()
+            .then(() => {
+                console.log('Connection to PostgreSQL closed');
+            })
+            .catch(err => {
+                console.error('Error closing PostgreSQL connection', err);
+            });
     });
