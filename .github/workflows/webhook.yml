@@ -204,7 +204,6 @@ jobs:
     name: Run backend
     runs-on: ubuntu-latest
     needs: [deploy-backend, deploy-backend-python]
-    if: ${{ needs.deploy-backend.status == 'completed' || needs.deploy-backend-python.status == 'completed' }}
     steps:
       - name: Run
         uses: appleboy/ssh-action@v0.1.10
