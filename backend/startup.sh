@@ -36,4 +36,6 @@ docker start $POSTGRES > /dev/null;
 
 echo "Running node server...";
 
-(nohup npm run dev 0<&- &>/dev/null &) && echo "Done!"
+(nohup npm run dev 0<&- &>/dev/null &) && echo "Done starting server"
+
+#node sql/client.js

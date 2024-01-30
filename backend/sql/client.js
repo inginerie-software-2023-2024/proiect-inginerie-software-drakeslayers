@@ -1,17 +1,32 @@
-const { Client } = require('pg');
+const {Client} = require('pg');
 
-const pgclient = new Client({
-    host: 'localhost',
-    port: 5432,
+const client = new Client({
+    host: '127.0.0.1',
     user: 'brontosaur',
+    database: 'dbMDS',
     password: '1234',
-    database: 'dbMDS'
+    port: 5432
 });
 
-pgclient.connect();
+client.connect()
+    .then(() => {
+        console.log('Connected to the PostgreSQL database');
 
-const table = 'CREATE TABLE IF NOT EXISTS public."Users" (id TEXT COLLATE pg_catalog."default" NOT NULL, email TEXT COLLATE pg_catalog."default" NOT NULL, "passwordHash" TEXT COLLATE pg_catalog."default" NOT NULL, CONSTRAINT "User_pkey" PRIMARY KEY (id)) TABLESPACE pg_default; ALTER TABLE IF EXISTS public."Users" OWNER TO brontosaur; COMMENT ON TABLE public."Users" IS \'Stores user credentials\';\n'
+        // const createDB = 'DROP DATABASE IF EXISTS "dbMDS"; CREATE DATABASE "dbMDS" WITH OWNER = brontosaur ENCODING = \'UTF8\' LC_COLLATE = \'en_US.utf8\' LC_CTYPE = \'en_US.utf8\' TABLESPACE = pg_default CONNECTION LIMIT = -1 IS_TEMPLATE = False;\n';
+        //
+        // client.database(createDB, (err, res) => {
+        //     if (err) {
+        //         console.error('Error creating DB', err);
+        //     } else {
+        //         console.log('DB create successfully');
+        //     }
+        // });
 
-pgclient.query(table, (err, res) => {
-    if (err) throw err
-});
+        return client.end();
+    })
+    .then(() => {
+        console.log('Connection to PostgreSQL closed');
+    })
+    .catch(err => {
+        console.error('Error connecting to PostgreSQL database', err);
+    });

@@ -16,9 +16,6 @@ jobs:
       run:
         working-directory: ./backend
 
-  runner-job:
-    # You must use a Linux environment when using service containers or container jobs
-    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres
@@ -33,28 +30,26 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    #      redis:
-    #        image: redis
-    #        options: >-
-    #          --health-cmd "redis-cli ping"
-    #          --health-interval 10s
-    #          --health-timeout 5s
-    #          --health-retries 5
-    #        ports:
-    #          - 6379:6379
-    #
-    #    strategy:
-    #      matrix:
-    #        node-version: [ 16.x, 18.x ]
-    #        python-version: [ 3.10 ]
+
+#      redis:
+#        image: redis
+#        options: >-
+#          --health-cmd "redis-cli ping"
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#        ports:
+#          - 6379:6379
+
+#    strategy:
+#      matrix:
+#        node-version: [ 16.x, 18.x ]
+#        python-version: [ 3.10 ]
+
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-
-      - name: Setup DB
-        run: |
-          psql -U runner -d dbMDS -a -f sql/users.sql 
 
       - name: Install dependencies Python
         working-directory: backend-python
