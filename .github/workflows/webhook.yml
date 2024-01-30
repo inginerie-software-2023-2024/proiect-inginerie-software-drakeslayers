@@ -102,7 +102,7 @@ jobs:
   build-frontend:
     name: Build frontend
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './frontend') || contains(github.event.commits.*.modified, './frontend') }}
+#    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './frontend') || contains(github.event.commits.*.modified, './frontend') }}
     defaults:
       run:
         working-directory: frontend
@@ -155,7 +155,7 @@ jobs:
   deploy-backend:
     name: Deploy backend
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './backend') || contains(github.event.commits.*.modified, './backend') }}
+#    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './backend') || contains(github.event.commits.*.modified, './backend') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
@@ -178,7 +178,7 @@ jobs:
   deploy-backend-python:
     name: Deploy backend-python
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './backend-python') || contains(github.event.commits.*.modified, './backend-python') }}
+#    if: ${{ github.event_name == 'push' && contains(github.event.commits.*.added, './backend-python') || contains(github.event.commits.*.modified, './backend-python') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
