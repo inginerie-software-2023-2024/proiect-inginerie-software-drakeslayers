@@ -16,7 +16,7 @@
 
         <div class="actions">
           <span class="date">{{ dateFormatted }}</span>
-          <button *ngIf="!isDescription" class="action-btn reply" (click)="onReplyClick()"><span>Reply</span></button>
+          <button *ngIf="!isDescription" class="action-btn reply" (click)="onReplyClick()" data-sel="activateReply"><span>Reply</span></button>
           <button
             *ngIf="!isDescription && replies.length > 0"
             class="action-btn show-replies-btn"
