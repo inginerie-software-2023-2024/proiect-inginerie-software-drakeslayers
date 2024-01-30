@@ -7,6 +7,7 @@ import path from 'path';
 
 export const defaultProfilePictureURL = "defaultImage.png";
 
+
 function getProfileMetaData(profile: Profile): Partial<Profile> {
     let profileMetaData: Partial<Profile> = {
         id: profile.id,
