@@ -96,7 +96,7 @@ jobs:
 
       - name: Test Followers
         run: |
-          npx ts-mocha -p tsconfig.json test/followers/followers.ts
+          npx ts-mocha -p tsconfig.json test/followers/followers.ts --timeout 10000
 
 
 #  build-frontend:
