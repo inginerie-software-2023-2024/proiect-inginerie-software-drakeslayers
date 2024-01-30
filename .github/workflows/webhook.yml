@@ -51,23 +51,23 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Install dependencies Python
-        working-directory: backend-python
-        run: |
-          pip install -r requirements.txt
+#      - name: Install dependencies Python
+#        working-directory: backend-python
+#        run: |
+#          pip install -r requirements.txt
 
       - name: Install dependencies JS
         run: |
           npm ci --omit=dev
 
-      - name: Setup DB
-        run: |
-          node sql/client.js
+#      - name: Setup DB
+#        run: |
+#          node sql/client.js
 
-      - name: Start server Python
-        working-directory: backend-python
-        run: |
-          (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
+#      - name: Start server Python
+#        working-directory: backend-python
+#        run: |
+#          (nohup python3 run.py 0<&- &>/dev/null &) && echo "Done!"
 
       - name: Start server JS
         run: |
